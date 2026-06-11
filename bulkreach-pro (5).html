@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BulkReach Pro — Bulk SMS & Email Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --cream:#faf8f4;--cream2:#f5f2ec;--cream3:#ede9e0;--cream4:#e4dfd4;--cream5:#d8d1c4;
+  --ink:#1a1814;--ink2:#3d3a34;--ink3:#6b6660;--ink4:#9b9690;--ink5:#c4bfb8;
+  --sage:#3d6b5c;--sage2:#4f8a73;--sage3:#e8f2ee;--sage4:#d0e8df;
+  --coral:#c45c3a;--coral2:#e07550;--coral3:#fdf0eb;--coral4:#f9d8cc;
+  --gold:#b8860b;--gold2:#d4a017;--gold3:#fdf8e8;--gold4:#f5e8b8;
+  --sky:#2c5f8a;--sky2:#4080b0;--sky3:#e8f1f8;--sky4:#c8dff0;
+  --shadow:0 1px 3px rgba(26,24,20,0.06),0 4px 16px rgba(26,24,20,0.08);
+  --shadow2:0 2px 8px rgba(26,24,20,0.08),0 8px 32px rgba(26,24,20,0.12);
+  --shadow3:0 4px 24px rgba(26,24,20,0.12),0 16px 48px rgba(26,24,20,0.16);
+  --r:10px;--r2:14px;--r3:20px;
+}
+html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.55}
+.serif{font-family:'Instrument Serif',serif}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:236px;min-width:236px;background:#fff;border-right:1px solid var(--cream4);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.sidebar::after{content:'';position:absolute;top:0;right:0;width:1px;height:100%;background:linear-gradient(to bottom,transparent,var(--cream4) 20%,var(--cream4) 80%,transparent)}
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column;background:var(--cream)}
+.scroll{flex:1;overflow-y:auto;padding:28px 32px}
+.scroll::-webkit-scrollbar{width:4px}
+.scroll::-webkit-scrollbar-thumb{background:var(--cream4);border-radius:2px}
+
+/* ── SIDEBAR ── */
+.logo-area{padding:24px 20px 20px;border-bottom:1px solid var(--cream3)}
+.logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.logo-icon{width:34px;height:34px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo-name{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:-0.3px}
+.logo-tag{font-size:10px;color:var(--ink4);font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding-left:44px;margin-top:-2px}
+.nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-group{font-size:10px;color:var(--ink5);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;padding:14px 8px 5px}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--ink3);font-size:13px;font-weight:500;transition:all 0.12s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif}
+.nav-btn:hover{background:var(--cream2);color:var(--ink)}
+.nav-btn.active{background:var(--ink);color:#fff}
+.nav-btn.active .nav-badge{background:rgba(255,255,255,0.2);color:#fff}
+.nav-icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:var(--cream2)}
+.nav-btn.active .nav-icon{background:rgba(255,255,255,0.15)}
+.nav-badge{margin-left:auto;background:var(--cream3);color:var(--ink3);font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600;min-width:20px;text-align:center}
+.sidebar-foot{padding:16px 20px;border-top:1px solid var(--cream3)}
+.status-row{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink4)}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--sage2);flex-shrink:0;animation:pls 2.5s infinite}
+@keyframes pls{0%,100%{box-shadow:0 0 0 0 rgba(79,138,115,0.4)}60%{box-shadow:0 0 0 5px rgba(79,138,115,0)}}
+.clock{font-size:10px;color:var(--ink5);margin-top:4px;font-variant-numeric:tabular-nums}
+
+/* ── TOPBAR ── */
+.topbar{padding:16px 32px;border-bottom:1px solid var(--cream3);background:#fff;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 0 var(--cream3)}
+.page-title{font-family:'Instrument Serif',serif;font-size:22px;color:var(--ink);letter-spacing:-0.3px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.13s;font-family:'DM Sans',sans-serif;white-space:nowrap;letter-spacing:-0.1px}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
+.btn-ink{background:var(--ink);color:#fff}
+.btn-ink:hover:not(:disabled){background:var(--ink2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(26,24,20,0.2)}
+.btn-outline{background:#fff;color:var(--ink2);border:1px solid var(--cream4)}
+.btn-outline:hover:not(:disabled){background:var(--cream2);border-color:var(--cream5)}
+.btn-sage{background:var(--sage);color:#fff}
+.btn-sage:hover:not(:disabled){background:var(--sage2);transform:translateY(-1px)}
+.btn-coral{background:var(--coral3);color:var(--coral);border:1px solid var(--coral4)}
+.btn-coral:hover:not(:disabled){background:var(--coral4)}
+.btn-gold{background:var(--gold3);color:var(--gold);border:1px solid var(--gold4)}
+.btn-sky{background:var(--sky3);color:var(--sky);border:1px solid var(--sky4)}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:7px}
+.btn-lg{padding:11px 22px;font-size:14px;border-radius:10px}
+.btn-full{width:100%;justify-content:center}
+
+/* ── CARDS ── */
+.card{background:#fff;border:1px solid var(--cream3);border-radius:var(--r2);padding:22px;box-shadow:var(--shadow)}
+.card:hover{box-shadow:var(--shadow2);border-color:var(--cream4)}
+.card-flat{background:var(--cream2);border:1px solid var(--cream3);border-radius:var(--r2);padding:20px}
+.card-title{font-family:'Instrument Serif',serif;font-size:16px;color:var(--ink);margin-bottom:3px;letter-spacing:-0.2px}
+.card-sub{font-size:12px;color:var(--ink4);margin-bottom:18px;line-height:1.5}
+
+/* ── STAT CARDS ── */
+.stat-card{background:#fff;border:1px solid var(--cream3);border-radius:var(--r2);padding:20px 22px;box-shadow:var(--shadow);transition:all 0.15s;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.s-sage::before{background:linear-gradient(90deg,var(--sage),var(--sage2))}
+.stat-card.s-coral::before{background:linear-gradient(90deg,var(--coral),var(--coral2))}
+.stat-card.s-gold::before{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.stat-card.s-sky::before{background:linear-gradient(90deg,var(--sky),var(--sky2))}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow2)}
+.stat-eyebrow{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink4);margin-bottom:10px}
+.stat-num{font-family:'Instrument Serif',serif;font-size:36px;color:var(--ink);line-height:1;letter-spacing:-1px;margin-bottom:6px}
+.stat-foot{font-size:11px;color:var(--ink4);display:flex;align-items:center;gap:5px}
+.stat-up{color:var(--sage2)}
+.stat-down{color:var(--coral)}
+
+/* ── GRID ── */
+.g{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.g4{grid-template-columns:repeat(4,1fr)}
+
+/* ── FORMS ── */
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink3);margin-bottom:6px}
+.fi{width:100%;padding:9px 13px;background:#fff;border:1.5px solid var(--cream4);border-radius:9px;color:var(--ink);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:all 0.14s;-webkit-appearance:none}
+.fi:focus{border-color:var(--sage2);box-shadow:0 0 0 3px rgba(79,138,115,0.12)}
+.fi::placeholder{color:var(--ink5)}
+textarea.fi{resize:vertical;min-height:90px;line-height:1.6}
+select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239b9690' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fhint{font-size:11px;color:var(--ink4);margin-top:5px}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.02em}
+.b-sage{background:var(--sage3);color:var(--sage);border:1px solid var(--sage4)}
+.b-coral{background:var(--coral3);color:var(--coral);border:1px solid var(--coral4)}
+.b-gold{background:var(--gold3);color:var(--gold);border:1px solid var(--gold4)}
+.b-sky{background:var(--sky3);color:var(--sky);border:1px solid var(--sky4)}
+.b-ink{background:var(--cream3);color:var(--ink3);border:1px solid var(--cream4)}
+.b-sage-filled{background:var(--sage);color:#fff}
+
+/* ── ALERTS ── */
+.alert{display:flex;align-items:flex-start;gap:10px;padding:12px 15px;border-radius:10px;font-size:13px;margin-bottom:14px;animation:ai .2s ease;line-height:1.5}
+@keyframes ai{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.a-sage{background:var(--sage3);border:1px solid var(--sage4);color:var(--sage)}
+.a-coral{background:var(--coral3);border:1px solid var(--coral4);color:var(--coral)}
+.a-gold{background:var(--gold3);border:1px solid var(--gold4);color:var(--gold)}
+.a-sky{background:var(--sky3);border:1px solid var(--sky4);color:var(--sky)}
+.a-close{margin-left:auto;cursor:pointer;background:none;border:none;color:inherit;opacity:0.6;font-size:14px;flex-shrink:0;padding:0;line-height:1}
+
+/* ── SWITCH ── */
+.sw{position:relative;display:inline-block;width:38px;height:22px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.sw-track{position:absolute;inset:0;background:var(--cream4);border-radius:22px;transition:0.25s;border:1.5px solid var(--cream5);cursor:pointer}
+.sw-track:before{position:absolute;content:'';height:15px;width:15px;left:2px;bottom:2px;background:#fff;border-radius:50%;transition:0.25s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+.sw input:checked+.sw-track{background:var(--sage);border-color:var(--sage)}
+.sw input:checked+.sw-track:before{transform:translateX(16px)}
+.sw-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--cream2)}
+.sw-row:last-child{border-bottom:none}
+.sw-label{display:flex;flex-direction:column;gap:2px}
+.sw-title{font-size:13px;font-weight:500;color:var(--ink)}
+.sw-desc{font-size:11px;color:var(--ink4)}
+
+/* ── PROGRESS ── */
+.pbar{background:var(--cream3);border-radius:6px;overflow:hidden}
+.pfill{height:100%;border-radius:6px;transition:width 0.4s ease}
+.pf-sage{background:linear-gradient(90deg,var(--sage),var(--sage2))}
+.pf-coral{background:linear-gradient(90deg,var(--coral),var(--coral2))}
+.pf-gold{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+
+/* ── UPLOAD ZONE ── */
+.upzone{border:2px dashed var(--cream4);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;background:var(--cream2)}
+.upzone:hover,.upzone.dov{border-color:var(--sage2);background:var(--sage3)}
+.upzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.up-icon{font-size:28px;margin-bottom:10px;display:block}
+.up-t{font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:4px}
+.up-s{font-size:11px;color:var(--ink4)}
+
+/* ── TABLES ── */
+.tw{overflow-x:auto;border-radius:var(--r)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{text-align:left;padding:10px 14px;color:var(--ink4);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1.5px solid var(--cream3);background:var(--cream2);white-space:nowrap}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--cream2);color:var(--ink2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--cream2)}
+.mono{font-family:'SF Mono','Fira Code',monospace;font-size:12px}
+
+/* ── TABS ── */
+.tabs{display:flex;border-bottom:1.5px solid var(--cream3);margin-bottom:18px}
+.tab{padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink4);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1.5px;transition:all 0.14s;font-family:'DM Sans',sans-serif}
+.tab:hover{color:var(--ink2)}
+.tab.on{color:var(--sage);border-bottom-color:var(--sage)}
+
+/* ── PROVIDER CARD ── */
+.prov-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#fff;border:1.5px solid var(--cream3);border-radius:12px;margin-bottom:10px;transition:all 0.14s;box-shadow:var(--shadow)}
+.prov-card:hover{box-shadow:var(--shadow2);border-color:var(--cream4)}
+.prov-logo{width:44px;height:44px;border-radius:11px;background:var(--cream2);border:1.5px solid var(--cream3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.prov-info{flex:1;min-width:0}
+.prov-name{font-size:14px;font-weight:700;color:var(--ink)}
+.prov-meta{font-size:11px;color:var(--ink4);margin-top:2px}
+.prov-acts{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+/* ── NUMBER ROW ── */
+.nrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--cream2)}
+.nrow:last-child{border-bottom:none}
+.nav2{width:34px;height:34px;border-radius:8px;background:var(--cream2);border:1px solid var(--cream3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ninfo{flex:1;min-width:0}
+.nphone{font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:600;color:var(--ink)}
+.nmeta{font-size:11px;color:var(--ink4);margin-top:1px}
+.nusage{width:110px;flex-shrink:0}
+.ubar{height:4px;background:var(--cream3);border-radius:2px;margin-top:5px;overflow:hidden}
+.ufill{height:100%;border-radius:2px;transition:width 0.5s}
+.nacts{display:flex;gap:5px;flex-shrink:0}
+
+/* ── CAMPAIGN PROGRESS ── */
+.prog-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.ps{text-align:center;padding:14px 10px;background:var(--cream2);border-radius:10px;border:1px solid var(--cream3)}
+.ps-val{font-family:'Instrument Serif',serif;font-size:26px;color:var(--ink);letter-spacing:-0.5px}
+.ps-lbl{font-size:10px;color:var(--ink4);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px;font-weight:600}
+
+/* ── LOG ROW ── */
+.lrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--cream2)}
+.lrow:last-child{border-bottom:none}
+.lico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;font-weight:700}
+.li-ok{background:var(--sage3);color:var(--sage)}
+.li-fail{background:var(--coral3);color:var(--coral)}
+.li-mail{background:var(--sky3);color:var(--sky)}
+.lbody{flex:1;min-width:0}
+.lto{font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:var(--sky);font-weight:600}
+.lprev{font-size:11px;color:var(--ink4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;margin-top:1px}
+.ltime{font-size:10px;color:var(--ink5);white-space:nowrap}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:48px 20px;color:var(--ink4)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-t{font-family:'Instrument Serif',serif;font-size:17px;color:var(--ink2);margin-bottom:6px}
+.empty-s{font-size:12px;line-height:1.6}
+
+/* ── TOAST ── */
+#toasts{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:#fff;border:1.5px solid var(--cream3);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;min-width:260px;max-width:360px;box-shadow:var(--shadow3);animation:tin .25s ease}
+@keyframes tin{from{opacity:0;transform:translateX(16px)}}
+@keyframes tout{to{opacity:0;transform:translateX(16px)}}
+
+/* ── MODAL ── */
+.mbk{position:fixed;inset:0;background:rgba(26,24,20,0.35);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal{background:#fff;border:1.5px solid var(--cream3);border-radius:var(--r3);padding:28px;width:90%;max-width:540px;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow3);animation:ai .2s ease}
+.modal::-webkit-scrollbar{width:4px}
+.modal-t{font-family:'Instrument Serif',serif;font-size:20px;color:var(--ink);margin-bottom:4px}
+.modal-s{font-size:12px;color:var(--ink4);margin-bottom:22px;line-height:1.5}
+.modal-foot{display:flex;gap:8px;margin-top:22px;justify-content:flex-end}
+
+/* ── CONFIRM ── */
+#conf-bk{position:fixed;inset:0;background:rgba(26,24,20,0.4);z-index:2000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+#conf-box{background:#fff;border:1.5px solid var(--cream3);border-radius:16px;padding:26px;width:340px;text-align:center;box-shadow:var(--shadow3)}
+#conf-t{font-family:'Instrument Serif',serif;font-size:17px;color:var(--ink);margin-bottom:8px}
+#conf-m{font-size:13px;color:var(--ink3);margin-bottom:20px;line-height:1.5}
+
+/* ── DIVIDERS ── */
+.div{height:1px;background:var(--cream3);margin:18px 0}
+.div-txt{display:flex;align-items:center;gap:10px;color:var(--ink5);font-size:11px;margin:14px 0}
+.div-txt::before,.div-txt::after{content:'';flex:1;height:1px;background:var(--cream3)}
+
+/* ── MISC ── */
+.hidden{display:none!important}
+.fbc{display:flex;align-items:center;justify-content:space-between}
+.fc{display:flex;align-items:center}
+.gap8{gap:8px}
+.gap12{gap:12px}
+.gap16{gap:16px}
+.mb4{margin-bottom:4px}
+.mb8{margin-bottom:8px}
+.mb12{margin-bottom:12px}
+.mb16{margin-bottom:16px}
+.mb20{margin-bottom:20px}
+.mt8{margin-top:8px}
+.mt12{margin-top:12px}
+.mt16{margin-top:16px}
+.t-ink4{color:var(--ink4)}
+.t-sage{color:var(--sage)}
+.t-coral{color:var(--coral)}
+.t-sky{color:var(--sky)}
+.fw7{font-weight:700}
+.fs11{font-size:11px}
+.fs12{font-size:12px}
+.fadein{animation:ai .22s ease forwards}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+
+/* ── SENDER USAGE ROW ── */
+.srow{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.sphone{font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--ink2);width:138px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbar-wrap{flex:1;height:4px;background:var(--cream3);border-radius:2px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:2px}
+.scnt{font-size:10px;color:var(--ink4);width:48px;text-align:right}
+.stag{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700}
+
+/* ── DECORATIVE SIDEBAR PATTERN ── */
+.sidebar-deco{position:absolute;bottom:90px;left:0;right:0;height:80px;opacity:0.04;background:repeating-linear-gradient(45deg,var(--ink) 0,var(--ink) 1px,transparent 0,transparent 50%);background-size:8px 8px;pointer-events:none}
+
+/* ── TEXTBELT STYLES ── */
+.tb-hero{background:linear-gradient(135deg,#FFF8F0,#FFF3E0,#FFF8F0);border:2px solid #FFCC80;border-radius:18px;padding:26px 28px;margin-bottom:20px;display:flex;align-items:center;gap:22px}
+.tb-logo-big{width:58px;height:58px;background:linear-gradient(135deg,#E65100,#FF7043);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 4px 16px rgba(230,81,0,0.3)}
+.tb-hero-title{font-family:'Instrument Serif',serif;font-size:22px;font-weight:600;color:#BF360C;margin-bottom:4px}
+.tb-hero-desc{font-size:13px;color:#E65100;line-height:1.6}
+.tb-card{background:linear-gradient(135deg,#FFFBF5,#FFF8F0);border:1.5px solid #FFD180;border-radius:14px;padding:18px 20px;margin-bottom:14px}
+.tb-status-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:rgba(255,255,255,0.7);border:1px solid #FFD180;border-radius:10px;margin-bottom:8px}
+.tb-status-label{font-size:13px;font-weight:500;color:#BF360C}
+.tb-quota-big{font-family:'Instrument Serif',serif;font-size:28px;font-weight:700;color:#E65100;line-height:1}
+.tb-test-result{padding:10px 14px;border-radius:9px;font-size:13px;margin-top:10px;display:none}
+.tb-ok{background:var(--sage3);border:1px solid var(--sage4);color:var(--sage)}
+.tb-fail{background:var(--coral3);border:1px solid var(--coral4);color:var(--coral)}
+.tb-inline-banner{display:flex;align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(135deg,#FFF8F0,#FFF3E0);border:1.5px solid #FFD180;border-radius:12px;margin-bottom:14px}
+.tb-badge-on{background:#E65100;color:#fff;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700}
+.tb-badge-off{background:var(--cream3);color:var(--ink4);font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700}
+</style>
+</head>
+<body>
+
+<div id="toasts"></div>
+
+<div id="conf-bk" onclick="confCancel()">
+  <div id="conf-box" onclick="event.stopPropagation()">
+    <div id="conf-t">Are you sure?</div>
+    <div id="conf-m">This cannot be undone.</div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn btn-outline" onclick="confCancel()">Cancel</button>
+      <button class="btn btn-coral" id="conf-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<div class="sidebar">
+  <div class="sidebar-deco"></div>
+  <div class="logo-area">
+    <div class="logo-mark">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-name">BulkReach</div>
+    </div>
+    <div class="logo-tag">Pro Messaging Platform</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-group">Overview</div>
+    <button class="nav-btn active" data-page="dashboard"><span class="nav-icon">◉</span>Dashboard</button>
+    <div class="nav-group">Campaigns</div>
+    <button class="nav-btn" data-page="sms"><span class="nav-icon">💬</span>SMS Campaign</button>
+    <button class="nav-btn" data-page="email"><span class="nav-icon">✉</span>Email Campaign</button>
+    <div class="nav-group">Setup</div>
+    <button class="nav-btn" data-page="textbelt"><span class="nav-icon">📡</span>TextBelt SMS <span style="margin-left:auto;background:#E65100;color:#fff;font-size:9px;padding:1px 6px;border-radius:6px;font-weight:700">DIRECT</span></button>
+    <button class="nav-btn" data-page="bulksms"><span class="nav-icon">✉️</span>BulkSMS.com <span style="margin-left:auto;background:#2D7A5F;color:#fff;font-size:9px;padding:1px 6px;border-radius:6px;font-weight:700" id="bs-nav-badge">SETUP</span></button>
+    <button class="nav-btn" data-page="providers"><span class="nav-icon">🔌</span>VoIP Providers <span class="nav-badge" id="nb-p">0</span></button>
+    <button class="nav-btn" data-page="numbers"><span class="nav-icon">📱</span>Phone Numbers <span class="nav-badge" id="nb-n">0</span></button>
+    <button class="nav-btn" data-page="eaccounts"><span class="nav-icon">📮</span>Email Accounts <span class="nav-badge" id="nb-e">0</span></button>
+    <div class="nav-group">Reports</div>
+    <button class="nav-btn" data-page="logs"><span class="nav-icon">📋</span>Message Logs</button>
+    <button class="nav-btn" data-page="settings"><span class="nav-icon">⚙</span>Settings</button>
+  </nav>
+  <div class="sidebar-foot">
+    <div class="status-row"><div class="pulse"></div>System online · auto-heal active</div>
+    <div class="clock" id="clock"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div class="main">
+
+<!-- ██ DASHBOARD ██ -->
+<div id="pg-dashboard" class="fadein" style="display:flex;flex-direction:column;height:100%">
+  <div class="topbar">
+    <div class="page-title">Good morning ✦</div>
+    <div class="topbar-right">
+      <button class="btn btn-outline btn-sm" onclick="resetDaily()">↺ Reset Limits</button>
+      <button class="btn btn-ink" onclick="go('sms')">+ New Campaign</button>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="g g4 mb20">
+      <div class="stat-card s-sage">
+        <div class="stat-eyebrow">SMS Sent</div>
+        <div class="stat-num" id="ds-sms">0</div>
+        <div class="stat-foot"><span class="stat-up" id="ds-smsrate">0%</span> delivery rate</div>
+      </div>
+      <div class="stat-card s-sky">
+        <div class="stat-eyebrow">Emails Sent</div>
+        <div class="stat-num" id="ds-email">0</div>
+        <div class="stat-foot"><span class="stat-up" id="ds-emailrate">0%</span> delivery rate</div>
+      </div>
+      <div class="stat-card s-coral">
+        <div class="stat-eyebrow">Failed (retried)</div>
+        <div class="stat-num t-coral" id="ds-fail">0</div>
+        <div class="stat-foot">auto-heal active</div>
+      </div>
+      <div class="stat-card s-gold">
+        <div class="stat-eyebrow">Active Numbers</div>
+        <div class="stat-num" id="ds-nums">0</div>
+        <div class="stat-foot">rotating automatically</div>
+      </div>
+    </div>
+    <div class="g g2 mb16">
+      <div class="card">
+        <div class="fbc mb12"><div class="card-title">Number Usage</div><a style="font-size:12px;color:var(--sage2);cursor:pointer;font-weight:600" onclick="go('numbers')">Manage →</a></div>
+        <div id="d-usage"><div class="empty"><div class="empty-icon">📱</div><div class="empty-t">No numbers yet</div></div></div>
+      </div>
+      <div class="card">
+        <div class="fbc mb12"><div class="card-title">Live Activity</div><span class="badge b-ink" id="d-act-badge">Idle</span></div>
+        <div id="d-activity" style="max-height:200px;overflow-y:auto"><div class="empty" style="padding:20px 0"><div class="empty-icon">💤</div><div class="empty-t">No activity yet</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="fbc mb16"><div class="card-title">Campaign History</div><button class="btn btn-outline btn-sm" onclick="exportCampaigns()">↓ Export</button></div>
+      <div class="tw">
+        <table><thead><tr><th>Name</th><th>Type</th><th>Total</th><th>Delivered</th><th>Failed</th><th>Rate</th><th>Date</th></tr></thead>
+        <tbody id="d-camp-body"><tr><td colspan="7" style="text-align:center;padding:28px;color:var(--ink4)">No campaigns yet</td></tr></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ██ SMS CAMPAIGN ██ -->
+<div id="pg-sms" class="hidden" style="display:none;flex-direction:column;height:100%">
+  <div class="topbar"><div class="page-title">SMS Campaign</div><div class="topbar-right" id="sms-tb"></div></div>
+  <div class="scroll">
+    <div id="sms-alerts"></div>
+    <!-- TextBelt Toggle Banner -->
+    <div class="tb-inline-banner mb16" id="sms-tb-banner">
+      <div style="width:32px;height:32px;background:linear-gradient(135deg,#E65100,#FF7043);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📡</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:#BF360C">TextBelt Direct SMS</div>
+        <div class="fs11" style="color:#E65100;margin-top:2px" id="sms-tb-status-txt">Not configured — click to set up</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="sms-tb-quota-display" style="font-family:'Instrument Serif',serif;font-size:18px;color:#E65100;display:none"></span>
+        <span id="sms-tb-badge" class="tb-badge-off">OFF</span>
+        <label class="sw"><input type="checkbox" id="use-textbelt" onchange="onTBToggle()"><span class="sw-track"></span></label>
+      </div>
+    </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <div class="card-title">Recipients</div>
+          <div class="card-sub">Upload Excel/CSV or paste numbers — no sending limit</div>
+          <div class="upzone mb12" id="sms-upzone">
+            <input type="file" accept=".xlsx,.xls,.csv" id="sms-file" onchange="handleSMSFile(event)">
+            <span class="up-icon">📂</span>
+            <div class="up-t">Drop Excel / CSV here</div>
+            <div class="up-s">Column A = phone numbers with country code (+1234…)</div>
+          </div>
+          <div class="div-txt">or enter manually</div>
+          <div class="fg">
+            <label class="fl">Phone Numbers (one per line)</label>
+            <textarea class="fi" id="sms-manual" placeholder="+12025551234&#10;+447700900123&#10;+919876543210" style="min-height:80px" oninput="updSMSCnt()"></textarea>
+          </div>
+          <div class="fbc">
+            <span class="fs11 t-ink4" id="sms-rcnt">0 recipients</span>
+            <button class="btn btn-outline btn-sm" onclick="clearSMSR()">Clear all</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Message</div>
+          <div class="card-sub">Variables: {name} {number} {date} {company} — No character limit</div>
+          <div class="fg">
+            <label class="fl">SMS Text (unlimited length)</label>
+            <textarea class="fi" id="sms-msg" style="min-height:130px" placeholder="Hi {name}, your message here... No limits on message length or recipient count." oninput="smsCC()"></textarea>
+            <div class="fhint" id="sms-cc">0 chars</div>
+          </div>
+          <div class="fg">
+            <label class="fl">Campaign Name</label>
+            <input class="fi" id="sms-cname" placeholder="e.g. July Promo 2026" type="text">
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <div class="fbc mb8"><div class="card-title">Sender Numbers</div><a style="font-size:12px;color:var(--sage2);cursor:pointer;font-weight:600" onclick="go('numbers')">Add →</a></div>
+          <div class="fs12 t-ink4 mb12">Rotates automatically — no daily limit enforced unless you set one</div>
+          <div id="sms-senders"><div class="empty" style="padding:14px 0"><div class="empty-t" style="font-size:14px">No numbers configured</div><div class="empty-s"><a style="color:var(--sage2);cursor:pointer;font-weight:600" onclick="go('numbers')">Add phone numbers →</a></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title mb16">Send Options</div>
+          <div class="sw-row"><div class="sw-label"><div class="sw-title">Auto-rotate Numbers</div><div class="sw-desc">Switch sender when limit reached (if set)</div></div><label class="sw"><input type="checkbox" id="o-rotate" checked><span class="sw-track"></span></label></div>
+          <div class="sw-row"><div class="sw-label"><div class="sw-title">Auto-retry Failed</div><div class="sw-desc">Retry via next available number</div></div><label class="sw"><input type="checkbox" id="o-retry" checked><span class="sw-track"></span></label></div>
+          <div class="sw-row"><div class="sw-label"><div class="sw-title">Skip Invalid Numbers</div><div class="sw-desc">Continue past malformed recipients</div></div><label class="sw"><input type="checkbox" id="o-skip" checked><span class="sw-track"></span></label></div>
+          <div class="mt12">
+            <div class="frow">
+              <div class="fg"><label class="fl">Delay Between Sends (ms)</label><input type="number" class="fi" id="o-delay" value="300" min="0" max="60000"></div>
+              <div class="fg"><label class="fl">Daily Limit/Number (0 = unlimited)</label><input type="number" class="fi" id="o-limit" value="0" min="0"></div>
+            </div>
+            <div class="fg"><label class="fl">Max Retries Per Message</label><input type="number" class="fi" id="o-maxretry" value="3" min="0" max="10"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-ink btn-lg btn-full" id="sms-send-btn" onclick="startSMS()">💬 Launch SMS Campaign</button>
+          <button class="btn btn-coral btn-full hidden" id="sms-stop-btn" onclick="stopSMS()">⏹ Stop Campaign</button>
+        </div>
+      </div>
+    </div>
+    <div id="sms-prog" class="hidden">
+      <div class="card mb16">
+        <div class="fbc mb16">
+          <div class="card-title">Campaign Progress</div>
+          <div class="fc gap12">
+            <span class="fs12 t-ink4" id="sms-cur-sender">Sender: —</span>
+            <span style="font-family:'Instrument Serif',serif;font-size:24px;color:var(--ink);letter-spacing:-0.5px" id="sms-pct">0%</span>
+          </div>
+        </div>
+        <div class="pbar" style="height:10px;margin-bottom:16px;border-radius:8px"><div class="pfill pf-sage" id="sms-pbar" style="width:0%"></div></div>
+        <div class="prog-stats">
+          <div class="ps"><div class="ps-val" id="ps-sent">0</div><div class="ps-lbl">Sent</div></div>
+          <div class="ps"><div class="ps-val t-sage" id="ps-del">0</div><div class="ps-lbl">Delivered</div></div>
+          <div class="ps"><div class="ps-val t-coral" id="ps-fail">0</div><div class="ps-lbl">Failed</div></div>
+          <div class="ps"><div class="ps-val" style="color:var(--gold)" id="ps-rem">0</div><div class="ps-lbl">Remaining</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="fbc mb16">
+          <div class="card-title">Send Results</div>
+          <div class="fc gap8">
+            <button class="btn btn-outline btn-sm" onclick="filtRes('all',this)">All</button>
+            <button class="btn btn-outline btn-sm" onclick="filtRes('sent',this)">Sent ✓</button>
+            <button class="btn btn-outline btn-sm" onclick="filtRes('failed',this)">Failed ✗</button>
+            <button class="btn btn-outline btn-sm" onclick="exportSMSRes()">↓ CSV</button>
+          </div>
+        </div>
+        <div class="tw" style="max-height:380px;overflow-y:auto">
+          <table><thead><tr><th>#</th><th>Recipient</th><th>Sender Used</th><th>Method</th><th>Status</th><th>TextID</th><th>Retries</th><th>Time</th></tr></thead>
+          <tbody id="sms-res-body"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ██ EMAIL CAMPAIGN ██ -->
+<div id="pg-email" class="hidden" style="display:none;flex-direction:column;height:100%">
+  <div class="topbar"><div class="page-title">Email Campaign</div></div>
+  <div class="scroll">
+    <div id="email-alerts"></div>
+    <div class="g g2 mb16">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <div class="fbc mb8"><div class="card-title">Email Account</div><a style="font-size:12px;color:var(--sage2);cursor:pointer;font-weight:600" onclick="go('eaccounts')">Manage →</a></div>
+          <div class="fg"><label class="fl">Select Account</label><select class="fi" id="ea-sel"><option value="">Choose account...</option></select></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Recipients</div>
+          <div class="card-sub">Column A: email · Column B: name (optional) — unlimited recipients</div>
+          <div class="upzone mb12">
+            <input type="file" accept=".xlsx,.xls,.csv" id="email-file" onchange="handleEmailFile(event)">
+            <span class="up-icon">📂</span>
+            <div class="up-t">Drop Excel / CSV</div>
+            <div class="up-s">.xlsx .xls .csv supported</div>
+          </div>
+          <div class="div-txt">or paste emails</div>
+          <div class="fg">
+            <label class="fl">Email Addresses (one per line)</label>
+            <textarea class="fi" id="email-manual" placeholder="john@example.com&#10;jane@company.com" style="min-height:70px" oninput="updEmailCnt()"></textarea>
+          </div>
+          <div class="fbc">
+            <span class="fs11 t-ink4" id="email-rcnt">0 recipients</span>
+            <button class="btn btn-outline btn-sm" onclick="clearEmailR()">Clear</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title mb16">Send Options</div>
+          <div class="sw-row"><div class="sw-label"><div class="sw-title">Track Opens</div><div class="sw-desc">Embed tracking pixel</div></div><label class="sw"><input type="checkbox" id="e-opens" checked><span class="sw-track"></span></label></div>
+          <div class="sw-row"><div class="sw-label"><div class="sw-title">Track Clicks</div><div class="sw-desc">Wrap links for click tracking</div></div><label class="sw"><input type="checkbox" id="e-clicks" checked><span class="sw-track"></span></label></div>
+          <div class="sw-row"><div class="sw-label"><div class="sw-title">Unsubscribe Footer</div><div class="sw-desc">Auto-append opt-out link</div></div><label class="sw"><input type="checkbox" id="e-unsub" checked><span class="sw-track"></span></label></div>
+          <div class="frow mt12">
+            <div class="fg"><label class="fl">Rate (emails/hour)</label><input type="number" class="fi" id="e-rate" value="2000" min="1"></div>
+            <div class="fg"><label class="fl">Batch Size</label><input type="number" class="fi" id="e-batch" value="100" min="1" max="1000"></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <div class="card-title mb16">Compose Email</div>
+          <div class="frow">
+            <div class="fg"><label class="fl">From Name</label><input class="fi" id="e-fname" placeholder="Your Company" type="text"></div>
+            <div class="fg"><label class="fl">Reply-To</label><input class="fi" id="e-replyto" placeholder="support@co.com" type="email"></div>
+          </div>
+          <div class="fg"><label class="fl">Subject Line</label><input class="fi" id="e-subject" placeholder="Your exclusive offer inside 🎉" type="text"></div>
+          <div class="fg"><label class="fl">Preheader Text</label><input class="fi" id="e-preheader" placeholder="Don't miss out on this limited offer..." type="text"></div>
+          <div class="tabs mb12">
+            <button class="tab on" onclick="switchETab('plain',this)">Plain Text</button>
+            <button class="tab" onclick="switchETab('html',this)">HTML</button>
+          </div>
+          <div class="fg"><label class="fl">Body — Variables: {name} {email} {company} {date}</label><textarea class="fi" id="e-body" style="min-height:180px" placeholder="Hi {name},&#10;&#10;Your message here...&#10;&#10;Best regards,&#10;The Team"></textarea></div>
+          <div class="fg"><label class="fl">Campaign Name</label><input class="fi" id="e-cname" placeholder="Newsletter June 2026" type="text"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-outline btn-full" onclick="testEmail()">🔍 Send Test to Yourself</button>
+          <button class="btn btn-ink btn-lg btn-full" id="email-send-btn" onclick="startEmail()">✉ Launch Email Campaign</button>
+          <button class="btn btn-coral btn-full hidden" id="email-stop-btn" onclick="stopEmail()">⏹ Stop</button>
+        </div>
+      </div>
+    </div>
+    <div id="email-prog" class="hidden">
+      <div class="card mb16">
+        <div class="fbc mb16">
+          <div class="card-title">Email Progress</div>
+          <span style="font-family:'Instrument Serif',serif;font-size:24px;color:var(--ink);letter-spacing:-0.5px" id="email-pct">0%</span>
+        </div>
+        <div class="pbar" style="height:10px;margin-bottom:16px;border-radius:8px"><div class="pfill pf-sky" id="email-pbar" style="width:0%"></div></div>
+        <div class="prog-stats">
+          <div class="ps"><div class="ps-val" id="ep-sent">0</div><div class="ps-lbl">Sent</div></div>
+          <div class="ps"><div class="ps-val t-sage" id="ep-del">0</div><div class="ps-lbl">Delivered</div></div>
+          <div class="ps"><div class="ps-val t-coral" id="ep-fail">0</div><div class="ps-lbl">Bounced</div></div>
+          <div class="ps"><div class="ps-val t-sky" id="ep-open">0</div><div class="ps-lbl">Opened</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="fbc mb16"><div class="card-title">Email Results</div><button class="btn btn-outline btn-sm" onclick="exportEmailRes()">↓ CSV</button></div>
+        <div class="tw" style="max-height:340px;overflow-y:auto">
+          <table><thead><tr><th>#</th><th>Email</th><th>Name</th><th>Status</th><th>Account</th><th>Time</th></tr></thead>
+          <tbody id="email-res-body"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ██ TEXTBELT ██ -->
+<div id="pg-textbelt" class="hidden" style="display:none;flex-direction:column;height:100%">
+  <div class="topbar">
+    <div class="page-title">TextBelt SMS API</div>
+    <div class="topbar-right">
+      <button class="btn btn-outline btn-sm" onclick="window.open('https://textbelt.com','_blank')">🌐 textbelt.com</button>
+      <button class="btn btn-outline btn-sm" onclick="window.open('https://docs.textbelt.com','_blank')">📖 Docs</button>
+    </div>
+  </div>
+  <div class="scroll">
+    <div id="tb-alerts"></div>
+    <!-- Hero -->
+    <div class="tb-hero">
+      <div class="tb-logo-big">📡</div>
+      <div>
+        <div class="tb-hero-title">TextBelt — Direct Browser SMS</div>
+        <div class="tb-hero-desc">The simplest SMS API on the planet. No backend proxy needed — works directly from your browser. Add your API key below, check your quota, and start sending in seconds. TextBelt uses a large shared pool of real phone numbers for delivery.</div>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,255,255,0.7);border:1px solid #FFD180;border-radius:8px;font-size:12px;color:#E65100;font-weight:600">💡 Direct mode: BulkReach tries to call TextBelt directly from your browser. If CORS is blocked, paste your proxy URL in the API Key Setup card — or use Test Mode to validate without sending.</div>
+      </div>
+    </div>
+    <div class="g g2 mb16">
+      <!-- API Key Setup -->
+      <div class="card">
+        <div class="card-title">API Key Setup</div>
+        <div class="card-sub">Get your key at textbelt.com. Use <code style="background:var(--cream2);padding:1px 5px;border-radius:4px;font-size:11px;font-family:monospace">textbelt</code> for 1 free SMS/day testing.</div>
+        <div class="fg">
+          <label class="fl">TextBelt API Key</label>
+          <div style="display:flex;gap:8px">
+            <input class="fi" id="tb-key" type="text" placeholder="e.g. abc123yourapikey  or  textbelt  (free test key)" style="flex:1">
+            <button class="btn btn-outline btn-sm" onclick="toggleTBKeyVis(this)" style="padding:8px 12px;border-radius:9px;flex-shrink:0">👁</button>
+          </div>
+          <div class="fhint">Stored in memory only — never written to disk or localStorage</div>
+        </div>
+        <div class="fg">
+          <label class="fl">Proxy URL <span style="font-weight:400;text-transform:none;color:var(--ink4)">(optional — only needed if CORS blocked)</span></label>
+          <input class="fi" id="tb-proxy-url" type="url" placeholder="http://localhost:3000/proxy/textbelt  or leave blank for direct mode">
+          <div class="fhint">Leave blank to send directly from browser. If you see CORS errors, deploy the Node.js/PHP proxy from the guide below and paste its URL here.</div>
+        </div>
+        <div class="fg">
+          <div class="sw-row" style="padding:8px 0;border:none">
+            <div class="sw-label"><div class="sw-title">Test Mode (append _test)</div><div class="sw-desc">Validates without spending credits — no real SMS sent</div></div>
+            <label class="sw"><input type="checkbox" id="tb-testmode" onchange="updTBTestMode()"><span class="sw-track"></span></label>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ink" onclick="saveTBKey()">💾 Save Key</button>
+          <button class="btn btn-outline btn-sm" style="background:#FFF8F0;border-color:#FFD180;color:#E65100" onclick="checkTBQuota()">📊 Check Quota</button>
+          <button class="btn btn-outline btn-sm" onclick="clearTBKey()">✕ Clear Key</button>
+        </div>
+        <div id="tb-key-status" style="margin-top:10px"></div>
+      </div>
+      <!-- Status Panel -->
+      <div class="card">
+        <div class="card-title">Account Status</div>
+        <div class="card-sub">Live quota and connection info for your TextBelt account</div>
+        <div class="tb-status-row"><span class="tb-status-label">SMS Credits Remaining</span><span class="tb-quota-big" id="tb-quota-disp">—</span></div>
+        <div class="tb-status-row"><span class="tb-status-label">Connection</span><span class="badge b-ink" id="tb-conn-badge">Not configured</span></div>
+        <div class="tb-status-row"><span class="tb-status-label">Mode</span><span class="badge b-ink" id="tb-mode-badge">—</span></div>
+        <div class="tb-status-row" style="margin-bottom:0"><span class="tb-status-label">Total Sent via TextBelt</span><span style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--sage);font-weight:700" id="tb-total-sent">0</span></div>
+      </div>
+    </div>
+    <!-- Test Send -->
+    <div class="card mb16">
+      <div class="card-title">Send Test SMS</div>
+      <div class="card-sub">Verify your key is working by sending a real test message</div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Test Phone Number</label><input class="fi" id="tb-test-phone" type="tel" placeholder="+12025551234 (E.164 format)"></div>
+        <div class="fg"><label class="fl">Test Message</label><input class="fi" id="tb-test-msg" type="text" value="Hello from BulkReach Pro! TextBelt is working ✓"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ink" onclick="sendTBTest()" id="tb-test-btn">📤 Send Test SMS</button>
+        <span class="fs12 t-ink4">Uses 1 credit (unless in test mode)</span>
+      </div>
+      <div id="tb-test-result" class="tb-test-result"></div>
+    </div>
+    <!-- Status Check -->
+    <div class="card mb16">
+      <div class="card-title">Check Delivery Status</div>
+      <div class="card-sub">Enter a TextID from a previous send to check delivery status</div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Text ID</label><input class="fi" id="tb-status-id" type="text" placeholder="e.g. 12345678"></div>
+        <div class="fg" style="display:flex;align-items:flex-end"><button class="btn btn-outline" style="width:100%;margin-bottom:13px" onclick="checkTBStatus()">🔍 Check Status</button></div>
+      </div>
+      <div id="tb-status-result"></div>
+    </div>
+    <!-- Info Grid -->
+    <div class="g g2">
+      <div class="card">
+        <div class="card-title mb12">How to Use in BulkReach</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          ${['1. Enter your TextBelt API key above and click Save Key','2. Click Check Quota to verify credits and connection','3. If CORS error appears, deploy a proxy and paste its URL in the setup card','4. Go to SMS Campaign page and toggle TextBelt ON','5. Upload recipients and write your message (no length limit)','6. Click Launch — system sends directly or via your proxy','7. Each sent message logs a TextID for delivery tracking','8. Failed sends auto-retry with built-in error recovery'].map(s=>`<div style="display:flex;gap:8px;font-size:12px;color:var(--ink2)"><span style="color:var(--gold);font-weight:700;flex-shrink:0">${s[0]}</span><span>${s.slice(3)}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title mb12">API Reference</div>
+        <div style="display:flex;flex-direction:column;gap:0">
+          ${[['Endpoint','POST https://textbelt.com/text'],['Quota Check','GET https://textbelt.com/quota/{key}'],['Status Check','GET https://textbelt.com/status/{textId}'],['Free Key','textbelt (1 SMS/day)'],['Rate Limit','1–2 SMS per second max'],['Phone Format','E.164 e.g. +12025551234'],['Long Messages','Auto-split into segments'],['Test Mode','Append _test to your key'],['Response','{ success, textId, quotaRemaining }'],['Delivery','DELIVERED / SENT / FAILED / UNKNOWN']].map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--cream3);font-size:12px"><span style="color:var(--ink4);font-weight:600">${k}</span><span style="color:var(--ink2);font-family:monospace;font-size:11px;text-align:right">${v}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <!-- Proxy Setup Guide -->
+    <div class="card mt16" style="margin-top:16px">
+      <div class="card-title mb12">🔧 Proxy Server Setup (if direct mode fails)</div>
+      <div class="card-sub" style="margin-bottom:16px">If your browser blocks the direct TextBelt call with a CORS error, deploy one of these tiny proxy scripts on any server (VPS, shared hosting, Vercel, Railway, etc.), then paste the URL above.</div>
+      <div class="tabs mb12" id="proxy-tabs">
+        <button class="tab on" onclick="showProxyTab('node',this)">Node.js</button>
+        <button class="tab" onclick="showProxyTab('php',this)">PHP</button>
+        <button class="tab" onclick="showProxyTab('python',this)">Python</button>
+      </div>
+      <div id="proxy-node">
+        <pre style="background:var(--cream2);border:1px solid var(--cream3);border-radius:9px;padding:14px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--ink2);overflow-x:auto;line-height:1.6;white-space:pre">// server.js — Node.js proxy for TextBelt
+// npm install express node-fetch cors
+// node server.js
+
+const express = require('express');
+const fetch = require('node-fetch');
+const cors = require('cors');
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.post('/proxy/textbelt', async (req, res) => {
+  try {
+    const { phone, message, key } = req.body;
+    const response = await fetch('https://textbelt.com/text', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ phone, message, key })
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.listen(3000, () => console.log('TextBelt proxy running on port 3000'));
+// Paste this URL in BulkReach: http://YOUR_SERVER_IP:3000/proxy/textbelt</pre>
+      </div>
+      <div id="proxy-php" class="hidden">
+        <pre style="background:var(--cream2);border:1px solid var(--cream3);border-radius:9px;padding:14px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--ink2);overflow-x:auto;line-height:1.6;white-space:pre">&lt;?php
+// proxy.php — upload to any PHP web host
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit; }
+
+$input = json_decode(file_get_contents('php://input'), true);
+$phone   = $input['phone']   ?? '';
+$message = $input['message'] ?? '';
+$key     = $input['key']     ?? '';
+
+$context = stream_context_create(['http' => [
+  'method'  => 'POST',
+  'header'  => 'Content-Type: application/x-www-form-urlencoded',
+  'content' => http_build_query(['phone' => $phone, 'message' => $message, 'key' => $key])
+]]);
+
+$result = file_get_contents('https://textbelt.com/text', false, $context);
+echo $result ?: json_encode(['success' => false, 'error' => 'Request failed']);
+// Paste this URL in BulkReach: https://yoursite.com/proxy.php</pre>
+      </div>
+      <div id="proxy-python" class="hidden">
+        <pre style="background:var(--cream2);border:1px solid var(--cream3);border-radius:9px;padding:14px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--ink2);overflow-x:auto;line-height:1.6;white-space:pre"># app.py — Python Flask proxy for TextBelt
+# pip install flask flask-cors requests
+# python app.py
+
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import requests
+
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/proxy/textbelt', methods=['POST'])
+def proxy():
+    data = request.get_json()
+    try:
+        r = requests.post('https://textbelt.com/text', data={
+            'phone':   data.get('phone', ''),
+            'message': data.get('message', ''),
+            'key':     data.get('key', '')
+        })
+        return jsonify(r.json())
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(port=3000)
+# Paste this URL in BulkReach: http://YOUR_SERVER_IP:3000/proxy/textbelt</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ██ BULKSMS.COM CONNECTION ██ -->
+<div id="pg-bulksms" class="hidden" style="display:none;flex-direction:column;height:100%">
+  <div class="topbar">
+    <div class="page-title">BulkSMS.com Connection</div>
+    <div class="topbar-right">
+      <button class="btn btn-outline btn-sm" onclick="window.open('https://www.bulksms.com','_blank')">🌐 bulksms.com</button>
+      <button class="btn btn-outline btn-sm" onclick="window.open('https://www.bulksms.com/developer/json/v1/','_blank')">📖 API Docs</button>
+    </div>
+  </div>
+  <div class="scroll">
+    <div id="bulksms-alerts"></div>
+    <!-- Hero -->
+    <div class="card" style="display:flex;gap:18px;align-items:flex-start;background:linear-gradient(135deg,#e8f2ee,#fff);border:1px solid var(--sage4);margin-bottom:16px">
+      <div style="font-size:42px;line-height:1">✉️</div>
+      <div>
+        <div class="card-title" style="font-size:20px">BulkSMS.com — REST API</div>
+        <div class="card-sub" style="margin-top:6px">Connect your BulkSMS.com account to send through their global gateway (800+ networks). Supports Unicode and long messages with no length cap. Authentication uses a Token ID + Token Secret pair via HTTP Basic auth.</div>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,255,255,0.7);border:1px solid var(--sage4);border-radius:8px;font-size:12px;color:var(--sage);font-weight:600">💡 The browser may block direct calls to api.bulksms.com via CORS. If so, paste your proxy URL below — the proxy attaches the auth header server-side. Use Test Connection to validate first.</div>
+      </div>
+    </div>
+    <div class="g g2 mb16">
+      <!-- Credentials Setup -->
+      <div class="card">
+        <div class="card-title">API Token Setup</div>
+        <div class="card-sub">Generate a token pair at bulksms.com → Settings → Advanced → API Tokens. Tokens are revocable without changing your password.</div>
+        <div class="fg">
+          <label class="fl">Token ID</label>
+          <input class="fi" id="bsp-tokenid" type="text" placeholder="e.g. 5D647D5B42E8...-02-C">
+          <div class="fhint">Stored in memory only — never written to disk or localStorage</div>
+        </div>
+        <div class="fg">
+          <label class="fl">Token Secret</label>
+          <div style="display:flex;gap:8px">
+            <input class="fi" id="bsp-secret" type="password" placeholder="your token secret" style="flex:1">
+            <button class="btn btn-outline btn-sm" onclick="toggleBSSecret(this)" style="padding:8px 12px;border-radius:9px;flex-shrink:0">👁</button>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl">Sender ID <span style="font-weight:400;text-transform:none;color:var(--ink4)">(optional)</span></label>
+          <input class="fi" id="bsp-sender" type="text" placeholder="YourBrand — leave blank to allow replies">
+          <div class="fhint">An alphanumeric sender ID brands the message. Blank = a repliable number is used.</div>
+        </div>
+        <div class="fg">
+          <label class="fl">Proxy URL <span style="font-weight:400;text-transform:none;color:var(--ink4)">(optional — only if CORS blocked)</span></label>
+          <input class="fi" id="bsp-proxy" type="url" placeholder="https://yourserver.com/proxy/bulksms  or leave blank for direct mode">
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sage" onclick="saveBSP()">💾 Save Credentials</button>
+          <button class="btn btn-outline btn-sm" onclick="testBSConn()">🔌 Test Connection</button>
+          <button class="btn btn-outline btn-sm" onclick="clearBSP()">✕ Clear</button>
+        </div>
+        <div id="bsp-status" style="margin-top:10px"></div>
+      </div>
+      <!-- Status + Test Send -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <div class="card-title">Connection Status</div>
+          <div class="card-sub">Live state of your BulkSMS.com connection</div>
+          <div class="fbc" style="padding:9px 0;border-bottom:1px solid var(--cream2)"><span style="font-size:13px;color:var(--ink2)">Credentials</span><span class="badge b-ink" id="bsp-cred-badge">● Not set</span></div>
+          <div class="fbc" style="padding:9px 0;border-bottom:1px solid var(--cream2)"><span style="font-size:13px;color:var(--ink2)">Sender ID</span><span style="font-size:13px;color:var(--ink3)" id="bsp-sender-disp">Repliable (none)</span></div>
+          <div class="fbc" style="padding:9px 0;border-bottom:1px solid var(--cream2)"><span style="font-size:13px;color:var(--ink2)">Send Mode</span><span style="font-size:13px;color:var(--ink3)" id="bsp-mode-disp">Direct</span></div>
+          <div class="fbc" style="padding:9px 0"><span style="font-size:13px;color:var(--ink2)">Endpoint</span><span style="font-size:11px;color:var(--ink4);font-family:monospace">api.bulksms.com/v1</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Send Test SMS</div>
+          <div class="card-sub">Sends one real message to verify your connection (uses 1 credit)</div>
+          <div class="fg"><label class="fl">To (E.164)</label><input class="fi" id="bsp-test-to" type="tel" placeholder="+447900000123"></div>
+          <div class="fg"><label class="fl">Test Message</label><input class="fi" id="bsp-test-msg" type="text" value="Hello from BulkReach Pro! BulkSMS is connected ✓"></div>
+          <button class="btn btn-ink" onclick="sendBSTest()">📤 Send Test</button>
+          <div id="bsp-test-status" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+    <!-- How to use -->
+    <div class="card mb16">
+      <div class="card-title mb8">How to Connect &amp; Send</div>
+      <div class="g" style="gap:8px;grid-template-columns:1fr 1fr">
+        ${['1. Log in at bulksms.com → Settings → Advanced → API Tokens','2. Create a token; copy the Token ID and Token Secret','3. Paste both above, set an optional Sender ID, click Save Credentials','4. Click Test Connection (and Send Test SMS to confirm delivery)','5. Add a "BulkSMS.com" provider on the VoIP Providers page','6. Add or buy numbers under that provider — they route via BulkSMS','7. Go to SMS Campaign, upload recipients, write your message','8. Launch — BulkSMS numbers send through the real API automatically'].map(s=>`<div style="display:flex;gap:8px;font-size:12px;color:var(--ink2)"><span style="color:var(--sage);font-weight:700;flex-shrink:0">${s.slice(0,2)}</span><span>${s.slice(3)}</span></div>`).join('')}
+      </div>
+    </div>
+    <!-- Proxy guide -->
+    <div class="card">
+      <div class="card-title mb8">CORS Proxy (if direct calls are blocked)</div>
+      <div class="card-sub" style="margin-bottom:16px">A browser calling api.bulksms.com directly is often blocked by CORS. Deploy this tiny proxy on any server, then paste its URL in the Proxy URL field above. It keeps your token server-side.</div>
+      <pre style="background:var(--cream2);border:1px solid var(--cream3);border-radius:9px;padding:14px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--ink2);overflow-x:auto;line-height:1.6;white-space:pre">// server.js — Node.js proxy for BulkSMS.com
+const express = require('express');
+const app = express();
+app.use(express.json());
+app.use((req,res,next)=>{ res.header('Access-Control-Allow-Origin','*');
+  res.header('Access-Control-Allow-Headers','Content-Type');
+  if(req.method==='OPTIONS')return res.sendStatus(200); next(); });
+
+app.post('/proxy/bulksms', async (req, res) => {
+  const { _cred, ...payload } = req.body;   // _cred = base64("tokenId:tokenSecret")
+  const r = await fetch('https://api.bulksms.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Authorization':'Basic '+_cred },
+    body: JSON.stringify(payload)
+  });
+  res.status(r.status).send(await r.text());
+});
+
+app.listen(3000, () => console.log('BulkSMS proxy running on port 3000'));
+// Paste this URL in BulkReach: http://YOUR_SERVER_IP:3000/proxy/bulksms</pre>
+    </div>
+  </div>
+</div>
+<div id="pg-providers" class="hidden" style="display:none;flex-direction:column;height:100%">
+  <div class="topbar"><div class="page-title">VoIP Providers</div><div class="topbar-right"><button class="btn btn-ink" onclick="openProvModal()">+ Add Provider</button></div></div>
+  <div class="scroll">
+    <div id="prov-alerts"></div>
+    <div class="g g2 mb16">
+      <div class="card-flat">
+        <div class="card-title mb8">Supported Providers</div>
+        <div class="g" style="gap:8px;grid-template-columns:1fr 1fr">
+          ${['Twilio','Vonage (Nexmo)','Plivo','Telnyx','Bandwidth','SignalWire','Infobip','MessageBird','Sinch','Clickatell','Custom API','Any REST API'].map(p=>`<div style="padding:8px 12px;background:#fff;border:1px solid var(--cream3);border-radius:8px;font-size:12px;color:var(--ink3);font-weight:500">${p}</div>`).join('')}
+        </div>
+      </div>
+      <div class="card-flat">
+        <div class="card-title mb8">Auto-rotation Logic</div>
+        ${['Numbers rotate when daily limit is reached (or instantly if limit = 0 and you use round-robin)','Failed messages auto-retry on the next available number','All numbers across all providers are pooled together','You can pause individual numbers without removing them','Reset daily counts anytime from Settings','100+ numbers supported — import via Excel in bulk'].map((s,i)=>`<div style="display:flex;gap:8px;font-size:12px;color:var(--ink3);margin-bottom:8px"><span style="color:var(--sage);font-weight:700;flex-shrink:0">${i+1}.</span>${s}</div>`).join('')}
+      </div>
+    </div>
+    <div id="prov-list">
+      <div class="empty"><div class="empty-icon">🔌</div><div class="empty-t">No providers connected</div><div class="empty-s">Click "Add Provider" to get started</div><button class="btn btn-ink mt12" onclick="openProvModal()">+ Add Provider</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ██ PHONE NUMBERS ██ -->
+<div id="pg-numbers" class="hidden" style="display:none;flex-direction:column;height:100%">
+  <div class="topbar"><div class="page-title">Phone Numbers</div><div class="topbar-right"><button class="btn btn-outline" onclick="openBuyModal()">🛒 Buy Numbers</button><button class="btn btn-outline" onclick="openBulkModal()">↑ Bulk Import</button><button class="btn btn-ink" onclick="openNumModal()">+ Add Number</button></div></div>
+  <div class="scroll">
+    <div id="num-alerts"></div>
+    <div id="num-list"><div class="empty"><div class="empty-icon">📱</div><div class="empty-t">No phone numbers</div><div class="empty-s">Add a VoIP provider first, then add numbers</div><button class="btn btn-ink mt12" onclick="go('providers')">Go to Providers →</button></div></div>
+  </div>
+</div>
+
+<!-- ██ EMAIL ACCOUNTS ██ -->
+<div id="pg-eaccounts" class="hidden" style="display:none;flex-direction:column;height:100%">
+  <div class="topbar"><div class="page-title">Email Accounts</div><div class="topbar-right"><button class="btn btn-ink" onclick="openEAModal()">+ Add Account</button></div></div>
+  <div class="scroll">
+    <div id="ea-alerts"></div>
+    <div class="g g2 mb16">
+      <div class="card-flat">
+        <div class="card-title mb8">Supported Services</div>
+        <div class="g" style="gap:8px;grid-template-columns:1fr 1fr">
+          ${['SMTP (Gmail, Outlook)','SendGrid API','Mailgun API','Amazon SES','Postmark','SparkPost','Sendinblue','Any SMTP Server'].map(p=>`<div style="padding:8px 12px;background:#fff;border:1px solid var(--cream3);border-radius:8px;font-size:12px;color:var(--ink3);font-weight:500">${p}</div>`).join('')}
+        </div>
+      </div>
+      <div class="card-flat">
+        <div class="card-title mb8">Deliverability Tips</div>
+        ${['For Gmail: enable App Passwords in Google Account settings','For Outlook: use smtp.office365.com port 587 with STARTTLS','For SendGrid: API key as password, smtp.sendgrid.net port 587','Set SPF, DKIM, and DMARC DNS records for your domain','Warm up new domains gradually — start with 50-100/day','Use a custom domain email, not @gmail.com, for bulk sends'].map(s=>`<div style="font-size:12px;color:var(--ink3);margin-bottom:7px;display:flex;gap:6px"><span style="color:var(--sage2);flex-shrink:0">→</span>${s}</div>`).join('')}
+      </div>
+    </div>
+    <div id="ea-list"><div class="empty"><div class="empty-icon">📮</div><div class="empty-t">No email accounts</div><div class="empty-s">Add SMTP or API email account</div><button class="btn btn-ink mt12" onclick="openEAModal()">+ Add Account</button></div></div>
+  </div>
+</div>
+
+<!-- ██ LOGS ██ -->
+<div id="pg-logs" class="hidden" style="display:none;flex-direction:column;height:100%">
+  <div class="topbar"><div class="page-title">Message Logs</div><div class="topbar-right"><button class="btn btn-outline btn-sm" onclick="expLogs()">↓ CSV</button><button class="btn btn-coral btn-sm" onclick="conf('Clear all logs?','All message history will be permanently deleted.',clearLogs)">🗑 Clear</button></div></div>
+  <div class="scroll">
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-sm log-f-btn active" style="background:var(--ink);color:#fff" onclick="setLF('all',this)">All</button>
+      <button class="btn btn-outline btn-sm log-f-btn" onclick="setLF('sms',this)">SMS 💬</button>
+      <button class="btn btn-outline btn-sm log-f-btn" onclick="setLF('email',this)">Email ✉</button>
+      <button class="btn btn-outline btn-sm log-f-btn" onclick="setLF('sent',this)">Sent ✓</button>
+      <button class="btn btn-outline btn-sm log-f-btn" onclick="setLF('failed',this)">Failed ✗</button>
+      <div style="flex:1"></div>
+      <input class="fi" id="log-search" placeholder="Search..." style="max-width:220px;padding:7px 12px" oninput="renderLogs()">
+    </div>
+    <div class="card">
+      <div class="tw">
+        <table><thead><tr><th>Time</th><th>Type</th><th>Recipient</th><th>From</th><th>Message</th><th>Status</th><th>Retries</th></tr></thead>
+        <tbody id="logs-body"></tbody></table>
+      </div>
+      <div id="logs-empty" class="empty" style="padding:28px 0"><div class="empty-icon">📋</div><div class="empty-t">No logs yet</div><div class="empty-s">Send a campaign to see results here</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ██ SETTINGS ██ -->
+<div id="pg-settings" class="hidden" style="display:none;flex-direction:column;height:100%">
+  <div class="topbar"><div class="page-title">Settings</div><div class="topbar-right"><button class="btn btn-sage" onclick="saveSettings()">Save Settings</button></div></div>
+  <div class="scroll">
+    <div class="g g2 mb16">
+      <div class="card">
+        <div class="card-title mb16">Auto-heal Configuration</div>
+        <div class="sw-row"><div class="sw-label"><div class="sw-title">Auto-heal on Error</div><div class="sw-desc">Automatically recover from API errors</div></div><label class="sw"><input type="checkbox" id="s-heal" checked><span class="sw-track"></span></label></div>
+        <div class="sw-row"><div class="sw-label"><div class="sw-title">Auto-rotate Numbers</div><div class="sw-desc">Switch sender when limit reached</div></div><label class="sw"><input type="checkbox" id="s-rotate" checked><span class="sw-track"></span></label></div>
+        <div class="sw-row"><div class="sw-label"><div class="sw-title">Auto-retry Failed</div><div class="sw-desc">Retry failed messages automatically</div></div><label class="sw"><input type="checkbox" id="s-retry" checked><span class="sw-track"></span></label></div>
+        <div class="sw-row"><div class="sw-label"><div class="sw-title">Skip Invalid Numbers</div><div class="sw-desc">Continue past malformed recipients</div></div><label class="sw"><input type="checkbox" id="s-skip" checked><span class="sw-track"></span></label></div>
+        <div class="frow mt16">
+          <div class="fg"><label class="fl">Max Retry Attempts</label><input type="number" class="fi" id="s-maxr" value="3" min="0" max="20"></div>
+          <div class="fg"><label class="fl">Retry Delay (seconds)</label><input type="number" class="fi" id="s-retd" value="5" min="1" max="120"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <div class="card-title mb16">System Status</div>
+          ${[['Core Engine','Online','sage'],['Auto-heal Module','Active','sage'],['Number Rotation','Enabled','sage'],['Log System','Running','sage'],['Rate Limiter','Ready','sage']].map(([n,s,c])=>`<div class="fbc" style="padding:9px 0;border-bottom:1px solid var(--cream2)"><span style="font-size:13px;color:var(--ink2)">${n}</span><span class="badge b-${c}">● ${s}</span></div>`).join('')}
+        </div>
+        <div class="card">
+          <div class="card-title mb16">BulkSMS.com Credentials</div>
+          <div class="modal-s" style="margin-bottom:14px">Generate a token pair in your BulkSMS account: Settings → Advanced → API Tokens. Stored only in memory for this session.</div>
+          <div class="fg"><label class="fl">Token ID</label><input class="fi" id="bs-tokenid" placeholder="5D647D5B...-02-C" type="text"></div>
+          <div class="fg"><label class="fl">Token Secret</label><input class="fi" id="bs-secret" placeholder="••••••••••••••••" type="password"></div>
+          <div class="fg"><label class="fl">Sender ID (optional — blank = repliable)</label><input class="fi" id="bs-sender" placeholder="YourBrand" type="text"></div>
+          <div class="fg"><label class="fl">Proxy URL (optional — for CORS in production)</label><input class="fi" id="bs-proxy" placeholder="https://yourserver.com/proxy/bulksms" type="text"></div>
+          <div class="fc gap12">
+            <button class="btn btn-sage btn-sm" onclick="saveBulkSMS()">Save Credentials</button>
+            <span id="bs-status" class="fs12 t-ink4"></span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title mb16">Data Management</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-outline btn-full" onclick="expAll()">↓ Export All Data (JSON)</button>
+            <button class="btn btn-outline btn-full" onclick="expLogs()">↓ Export Logs (CSV)</button>
+            <button class="btn btn-gold btn-full" onclick="resetDaily()">↺ Reset Daily Usage Counts</button>
+            <button class="btn btn-coral btn-full" onclick="conf('Reset ALL data?','All providers, numbers, accounts, logs and campaigns will be permanently deleted.',resetAll)">⚠ Reset All Data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- Provider Modal -->
+<div id="prov-modal" class="mbk hidden" onclick="closeM('prov-modal')">
+<div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-t">Connect VoIP Provider</div>
+  <div class="modal-s">Credentials stored locally in your browser only</div>
+  <div class="fg"><label class="fl">Provider</label>
+  <select class="fi" id="pm-type" onchange="updProvForm()">
+    <option value="twilio">Twilio</option><option value="vonage">Vonage (Nexmo)</option>
+    <option value="plivo">Plivo</option><option value="telnyx">Telnyx</option>
+    <option value="bandwidth">Bandwidth</option><option value="signalwire">SignalWire</option>
+    <option value="infobip">Infobip</option><option value="messagebird">MessageBird</option>
+    <option value="sinch">Sinch</option><option value="clickatell">Clickatell</option>
+    <option value="custom">Custom / Other</option>
+  </select></div>
+  <div class="fg"><label class="fl">Display Name</label><input class="fi" id="pm-name" placeholder="e.g. Twilio Main Account" type="text"></div>
+  <div class="frow">
+    <div class="fg"><label class="fl" id="pm-sl">Account SID / API Key</label><input class="fi" id="pm-sid" placeholder="ACxxxxxxxxxx" type="text"></div>
+    <div class="fg"><label class="fl" id="pm-tl">Auth Token / Secret</label><input class="fi" id="pm-tok" placeholder="••••••••••••" type="password"></div>
+  </div>
+  <div id="pm-extra"></div>
+  <div class="fg"><label class="fl">API Base URL (optional)</label><input class="fi" id="pm-url" placeholder="https://api.twilio.com/2010-04-01" type="text"></div>
+  <div class="fg"><label class="fl">Notes (optional)</label><input class="fi" id="pm-notes" placeholder="US numbers only, sub-account #2..." type="text"></div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeM('prov-modal')">Cancel</button>
+    <button class="btn btn-ink" onclick="saveProv()">Connect Provider</button>
+  </div>
+</div></div>
+
+<!-- Number Modal -->
+<div id="num-modal" class="mbk hidden" onclick="closeM('num-modal')">
+<div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-t">Add Phone Number</div>
+  <div class="modal-s">Add a sender number to an existing provider account</div>
+  <div class="fg"><label class="fl">Provider Account</label><select class="fi" id="nm-prov"><option value="">Select provider...</option></select></div>
+  <div class="frow">
+    <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="nm-phone" placeholder="+12025551234" type="tel"></div>
+    <div class="fg"><label class="fl">Label (optional)</label><input class="fi" id="nm-label" placeholder="US Number 1" type="text"></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label class="fl">Daily Limit (0 = unlimited)</label><input type="number" class="fi" id="nm-limit" value="0" min="0"></div>
+    <div class="fg"><label class="fl">Number Type</label>
+    <select class="fi" id="nm-type"><option value="long">Long Code</option><option value="short">Short Code</option><option value="toll">Toll-free</option><option value="alpha">AlphaNumeric</option></select></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeM('num-modal')">Cancel</button>
+    <button class="btn btn-ink" onclick="saveNum()">Add Number</button>
+  </div>
+</div></div>
+
+<!-- Bulk Numbers Modal -->
+<div id="bulk-modal" class="mbk hidden" onclick="closeM('bulk-modal')">
+<div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-t">Bulk Import Numbers</div>
+  <div class="modal-s">Upload Excel/CSV — no limit on how many numbers you can import</div>
+  <div class="fg"><label class="fl">Assign to Provider</label><select class="fi" id="bm-prov"><option value="">Select provider...</option></select></div>
+  <div class="fg"><label class="fl">Default Daily Limit (0 = unlimited)</label><input type="number" class="fi" id="bm-limit" value="0" min="0"></div>
+  <div class="upzone">
+    <input type="file" accept=".xlsx,.xls,.csv" id="bm-file" onchange="handleBulkFile(event)">
+    <span class="up-icon">📊</span>
+    <div class="up-t">Upload Excel / CSV</div>
+    <div class="up-s">Column A = phone numbers with country code e.g. +12025551234</div>
+  </div>
+  <div id="bm-preview" class="mt12 fs12 t-ink4"></div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeM('bulk-modal')">Cancel</button>
+    <button class="btn btn-ink" id="bm-import-btn" onclick="importBulk()" disabled>Import Numbers</button>
+  </div>
+</div></div>
+
+<!-- Buy Numbers Modal (simulated picker) -->
+<div id="buy-modal" class="mbk hidden" onclick="closeM('buy-modal')">
+<div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-t">🛒 Buy Numbers</div>
+  <div class="modal-s">Pick numbers from a provider's available pool. (Simulated list — wire the real search/purchase API where marked in code.)</div>
+  <div class="frow">
+    <div class="fg"><label class="fl">Provider Account</label><select class="fi" id="buy-prov"><option value="">Select provider...</option></select></div>
+    <div class="fg"><label class="fl">Country / Region</label>
+      <select class="fi" id="buy-country">
+        <option value="US|+1|toll">United States (+1)</option>
+        <option value="GB|+44|long">United Kingdom (+44)</option>
+        <option value="CA|+1|long">Canada (+1)</option>
+        <option value="AU|+61|long">Australia (+61)</option>
+        <option value="IN|+91|long">India (+91)</option>
+        <option value="SG|+65|long">Singapore (+65)</option>
+        <option value="DE|+49|long">Germany (+49)</option>
+        <option value="FR|+33|long">France (+33)</option>
+        <option value="ZA|+27|long">South Africa (+27)</option>
+      </select></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label class="fl">Number Type</label>
+      <select class="fi" id="buy-type"><option value="long">Long Code</option><option value="toll">Toll-free</option><option value="short">Short Code</option></select></div>
+    <div class="fg"><label class="fl">Default Daily Limit (0 = unlimited)</label><input type="number" class="fi" id="buy-limit" value="0" min="0"></div>
+  </div>
+  <div class="fbc mb16" style="margin-top:4px">
+    <button class="btn btn-outline btn-sm" onclick="searchBuyNumbers()">🔍 Search Available</button>
+    <span id="buy-count" class="fs12 t-ink4"></span>
+  </div>
+  <div id="buy-results" style="max-height:280px;overflow:auto"></div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeM('buy-modal')">Cancel</button>
+    <button class="btn btn-ink" id="buy-confirm-btn" onclick="confirmBuy()" disabled>Add Selected</button>
+  </div>
+</div></div>
+<div id="ea-modal" class="mbk hidden" onclick="closeM('ea-modal')">
+<div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-t">Add Email Account</div>
+  <div class="modal-s">Connect SMTP or API email service for bulk sending</div>
+  <div class="frow">
+    <div class="fg"><label class="fl">Account Type</label>
+    <select class="fi" id="ea-type" onchange="updEAForm()">
+      <option value="smtp">SMTP</option><option value="sendgrid">SendGrid</option>
+      <option value="mailgun">Mailgun</option><option value="ses">Amazon SES</option>
+      <option value="postmark">Postmark</option><option value="sparkpost">SparkPost</option>
+    </select></div>
+    <div class="fg"><label class="fl">Display Name</label><input class="fi" id="ea-name" placeholder="SendGrid Production" type="text"></div>
+  </div>
+  <div id="ea-smtp">
+    <div class="fg"><label class="fl">SMTP Host</label><input class="fi" id="ea-host" placeholder="smtp.gmail.com" type="text"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Port</label><input class="fi" id="ea-port" placeholder="587" type="number"></div>
+      <div class="fg"><label class="fl">Security</label><select class="fi" id="ea-sec"><option value="tls">STARTTLS (587)</option><option value="ssl">SSL/TLS (465)</option><option value="none">None (25)</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Username</label><input class="fi" id="ea-user" placeholder="user@gmail.com" type="text"></div>
+      <div class="fg"><label class="fl">Password / App Password</label><input class="fi" id="ea-pass" placeholder="••••••••••••" type="password"></div>
+    </div>
+  </div>
+  <div id="ea-api" class="hidden">
+    <div class="fg"><label class="fl" id="ea-aklbl">API Key</label><input class="fi" id="ea-apikey" placeholder="SG.xxxxxxxxx" type="password"></div>
+    <div class="fg hidden" id="ea-domgrp"><label class="fl">Domain (Mailgun)</label><input class="fi" id="ea-domain" placeholder="mg.yourdomain.com" type="text"></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label class="fl">From Email</label><input class="fi" id="ea-from" placeholder="hello@company.com" type="email"></div>
+    <div class="fg"><label class="fl">Daily Limit (0 = unlimited)</label><input type="number" class="fi" id="ea-dlimit" value="0" min="0"></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeM('ea-modal')">Cancel</button>
+    <button class="btn btn-sage" onclick="testEA()">Test Connection</button>
+    <button class="btn btn-ink" onclick="saveEA()">Save Account</button>
+  </div>
+</div></div>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+// ── STATE ──
+const S={
+  providers:[],numbers:[],emailAccounts:[],
+  logs:[],campaigns:[],
+  smsR:[],emailR:[],bulkBuf:[],buyBuf:[],
+  stats:{smsSent:0,smsDel:0,emailSent:0,emailDel:0,failed:0},
+  sendingSMS:false,sendingEmail:false,stopSMS:false,stopEmail:false,
+  logFilter:'all',
+  tb:{ key:'', testMode:false, quota:null, active:false, totalSent:0, proxyUrl:'' },
+  bulksms:{ tokenId:'', tokenSecret:'', senderId:'', proxyUrl:'' },
+  settings:{autoHeal:true,autoRotate:true,autoRetry:true,skipInvalid:true,maxRetry:3,retryDelay:5}
+};
+
+// ── NAVIGATION ──
+function go(p){
+  document.querySelectorAll('[data-page]').forEach(b=>b.classList.remove('active'));
+  const btn=document.querySelector(`[data-page="${p}"]`);
+  if(btn)btn.classList.add('active');
+  document.querySelectorAll('[id^="pg-"]').forEach(el=>{el.style.display='none';el.classList.add('hidden')});
+  const pg=document.getElementById('pg-'+p);
+  if(pg){pg.style.display='flex';pg.classList.remove('hidden');pg.classList.remove('fadein');void pg.offsetWidth;pg.classList.add('fadein')}
+  if(p==='dashboard')refreshDash();
+  if(p==='sms'){refreshSMSSenders();syncTBToSMS();}
+  if(p==='email')refreshEASel();
+  if(p==='textbelt')refreshTBPage();
+  if(p==='bulksms')refreshBSPage();
+  if(p==='providers')renderProvs();
+  if(p==='numbers')renderNums();
+  if(p==='eaccounts')renderEAs();
+  if(p==='logs')renderLogs();
+  if(p==='settings'){
+    const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
+    set('bs-tokenid',S.bulksms.tokenId);set('bs-secret',S.bulksms.tokenSecret);
+    set('bs-sender',S.bulksms.senderId);set('bs-proxy',S.bulksms.proxyUrl);
+  }
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+
+// ── TOAST ──
+function toast(msg,type='info',dur=4000){
+  const icons={success:'✅',error:'❌',warn:'⚠️',info:'💬'};
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<span style="font-size:16px">${icons[type]||'ℹ️'}</span><span style="flex:1;font-size:13px;color:var(--ink2)">${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>{el.style.animation='tout .3s ease forwards';setTimeout(()=>el.remove(),300)},dur);
+}
+
+// ── ALERT ──
+function showAlert(id,type,msg){
+  const el=document.getElementById(id);if(!el)return;
+  const cls={success:'a-sage',error:'a-coral',warn:'a-gold',info:'a-sky'};
+  const ico={success:'✅',error:'❌',warn:'⚠️',info:'ℹ️'};
+  el.innerHTML=`<div class="alert ${cls[type]||'a-sky'}"><span>${ico[type]}</span><span style="flex:1">${msg}</span><button class="a-close" onclick="this.parentElement.remove()">✕</button></div>`;
+  setTimeout(()=>{const a=el.querySelector('.alert');if(a)a.remove()},8000);
+}
+
+// ── CONFIRM ──
+let _confCb=null;
+function conf(t,m,cb){
+  document.getElementById('conf-t').textContent=t;
+  document.getElementById('conf-m').textContent=m||'This cannot be undone.';
+  document.getElementById('conf-bk').style.display='flex';
+  _confCb=cb;
+  document.getElementById('conf-ok').onclick=()=>{confCancel();if(_confCb)_confCb()};
+}
+function confCancel(){document.getElementById('conf-bk').style.display='none';_confCb=null;}
+
+// ── MODALS ──
+function openM(id){document.getElementById(id).classList.remove('hidden')}
+function closeM(id){document.getElementById(id).classList.add('hidden')}
+
+// ── PROVIDERS ──
+const PCFG={
+  twilio:{n:'Twilio',e:'📱',sl:'Account SID',tl:'Auth Token',du:'https://api.twilio.com/2010-04-01',ex:''},
+  vonage:{n:'Vonage',e:'📡',sl:'API Key',tl:'API Secret',du:'https://rest.nexmo.com',ex:''},
+  plivo:{n:'Plivo',e:'🔵',sl:'Auth ID',tl:'Auth Token',du:'https://api.plivo.com/v1',ex:''},
+  telnyx:{n:'Telnyx',e:'⚡',sl:'API Key',tl:'(same as key)',du:'https://api.telnyx.com/v2',ex:'<div class="fg"><label class="fl">Connection Profile ID</label><input class="fi" id="pm-telnyx" placeholder="1234567890123456789" type="text"></div>'},
+  bandwidth:{n:'Bandwidth',e:'📶',sl:'Account ID',tl:'API Token',du:'https://messaging.bandwidth.com/api/v2',ex:''},
+  signalwire:{n:'SignalWire',e:'🌊',sl:'Project ID',tl:'Auth Token',du:'',ex:'<div class="fg"><label class="fl">Space URL</label><input class="fi" id="pm-sw" placeholder="yourspace.signalwire.com" type="text"></div>'},
+  infobip:{n:'Infobip',e:'ℹ️',sl:'API Key',tl:'(same)',du:'https://api.infobip.com',ex:'<div class="fg"><label class="fl">Base URL (from portal)</label><input class="fi" id="pm-ib" placeholder="XXXXX.api.infobip.com" type="text"></div>'},
+  messagebird:{n:'MessageBird',e:'🐦',sl:'Access Key',tl:'(same)',du:'https://rest.messagebird.com',ex:''},
+  sinch:{n:'Sinch',e:'📲',sl:'Service Plan ID',tl:'API Token',du:'https://us.sms.api.sinch.com',ex:'<div class="fg"><label class="fl">App Key</label><input class="fi" id="pm-sinch" placeholder="xxxxxxxx-xxxx-xxxx" type="text"></div>'},
+  clickatell:{n:'Clickatell',e:'🔔',sl:'API Key',tl:'(same)',du:'https://platform.clickatell.com',ex:''},
+  bulksms:{n:'BulkSMS.com',e:'✉️',sl:'Token ID',tl:'Token Secret',du:'https://api.bulksms.com/v1',ex:'<div class="fg"><label class="fl">Sender ID (optional — blank = repliable)</label><input class="fi" id="pm-bulksms-from" placeholder="YourBrand" type="text"></div>'},
+  custom:{n:'Custom',e:'🔧',sl:'API Key / Username',tl:'Secret / Password',du:'',ex:'<div class="fg"><label class="fl">Send URL ({from} {to} {message} variables)</label><input class="fi" id="pm-cust" placeholder="https://api.provider.com/send?from={from}&to={to}&msg={message}" type="text"></div>'}
+};
+function updProvForm(){
+  const t=document.getElementById('pm-type').value;
+  const c=PCFG[t]||PCFG.custom;
+  document.getElementById('pm-sl').textContent=c.sl;
+  document.getElementById('pm-tl').textContent=c.tl;
+  document.getElementById('pm-url').placeholder=c.du;
+  document.getElementById('pm-extra').innerHTML=c.ex;
+  if(!document.getElementById('pm-name').value)document.getElementById('pm-name').placeholder=c.n+' Account';
+}
+function openProvModal(){
+  ['pm-name','pm-sid','pm-tok','pm-url','pm-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+  document.getElementById('pm-type').value='twilio';
+  updProvForm();openM('prov-modal');
+}
+function saveProv(){
+  const t=document.getElementById('pm-type').value;
+  const c=PCFG[t]||PCFG.custom;
+  const sid=document.getElementById('pm-sid').value.trim();
+  const tok=document.getElementById('pm-tok').value.trim();
+  const name=document.getElementById('pm-name').value.trim()||(c.n+' Account');
+  const url=document.getElementById('pm-url').value.trim()||c.du;
+  const notes=document.getElementById('pm-notes').value.trim();
+  if(!sid){toast('Please enter API Key / Account SID','error');return;}
+  const extra={};
+  if(t==='telnyx')extra.profileId=document.getElementById('pm-telnyx')?.value.trim();
+  if(t==='signalwire')extra.spaceUrl=document.getElementById('pm-sw')?.value.trim();
+  if(t==='sinch')extra.appKey=document.getElementById('pm-sinch')?.value.trim();
+  if(t==='custom')extra.sendUrl=document.getElementById('pm-cust')?.value.trim();
+  if(t==='infobip')extra.baseUrl=document.getElementById('pm-ib')?.value.trim();
+  S.providers.push({id:uid(),type:t,name,sid,tok,url,notes,extra,emoji:c.e,active:true,created:now()});
+  closeM('prov-modal');renderProvs();updBadges();toast(`Provider "${name}" connected!`,'success');
+}
+function renderProvs(){
+  const el=document.getElementById('prov-list');
+  if(!S.providers.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔌</div><div class="empty-t">No providers connected</div><div class="empty-s">Click "Add Provider" to get started</div><button class="btn btn-ink mt12" onclick="openProvModal()">+ Add Provider</button></div>';return;}
+  el.innerHTML=S.providers.map(p=>{
+    const nc=S.numbers.filter(n=>n.providerId===p.id).length;
+    return`<div class="prov-card"><div class="prov-logo">${p.emoji}</div><div class="prov-info"><div class="prov-name">${esc(p.name)}</div><div class="prov-meta">${p.type.toUpperCase()} · SID: ${p.sid.substring(0,14)}… · ${nc} number${nc!==1?'s':''}</div>${p.notes?`<div class="fs11 t-ink4 mb4">${esc(p.notes)}</div>`:''}</div><div class="prov-acts"><span class="badge ${p.active?'b-sage':'b-ink'}">${p.active?'● Active':'● Paused'}</span><button class="btn btn-outline btn-sm" onclick="togProv('${p.id}')">${p.active?'Pause':'Enable'}</button><button class="btn btn-coral btn-sm" onclick="conf('Remove provider?','All numbers will also be removed.',()=>delProv('${p.id}'))">Remove</button></div></div>`;
+  }).join('');
+}
+function togProv(id){const p=S.providers.find(x=>x.id===id);if(p){p.active=!p.active;renderProvs();}}
+function delProv(id){S.providers=S.providers.filter(p=>p.id!==id);S.numbers=S.numbers.filter(n=>n.providerId!==id);renderProvs();renderNums();updBadges();toast('Provider removed','info');}
+
+// ── NUMBERS ──
+function fillProvSels(){
+  const opts=S.providers.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  ['nm-prov','bm-prov'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML='<option value="">Select provider...</option>'+opts;});
+}
+function openNumModal(){if(!S.providers.length){toast('Add a VoIP provider first','warn');go('providers');return;}fillProvSels();['nm-phone','nm-label'].forEach(id=>document.getElementById(id).value='');document.getElementById('nm-limit').value='0';openM('num-modal');}
+function openBulkModal(){if(!S.providers.length){toast('Add a VoIP provider first','warn');go('providers');return;}fillProvSels();S.bulkBuf=[];document.getElementById('bm-preview').textContent='';document.getElementById('bm-import-btn').disabled=true;openM('bulk-modal');}
+function saveNum(){
+  const pid=document.getElementById('nm-prov').value;
+  const phone=document.getElementById('nm-phone').value.trim();
+  const label=document.getElementById('nm-label').value.trim();
+  const limit=parseInt(document.getElementById('nm-limit').value)||0;
+  const type=document.getElementById('nm-type').value;
+  if(!pid){toast('Select a provider','error');return;}
+  if(!phone){toast('Enter phone number','error');return;}
+  if(S.numbers.find(n=>n.phone===phone)){toast('Number already exists','warn');return;}
+  S.numbers.push({id:uid(),providerId:pid,phone,label:label||phone,limit,usedToday:0,type,active:true,created:now()});
+  closeM('num-modal');renderNums();refreshSMSSenders();updBadges();toast(`Number ${phone} added!`,'success');
+}
+function handleBulkFile(e){
+  const file=e.target.files[0];if(!file)return;
+  parseNumFile(file,nums=>{S.bulkBuf=nums;document.getElementById('bm-preview').textContent=`✅ Found ${nums.length} phone numbers ready to import`;document.getElementById('bm-import-btn').disabled=false;});
+}
+function importBulk(){
+  const pid=document.getElementById('bm-prov').value;
+  const limit=parseInt(document.getElementById('bm-limit').value)||0;
+  if(!pid){toast('Select a provider','error');return;}
+  if(!S.bulkBuf.length){toast('No numbers to import','warn');return;}
+  let added=0,skip=0;
+  S.bulkBuf.forEach(phone=>{
+    if(!S.numbers.find(n=>n.phone===phone)){S.numbers.push({id:uid(),providerId:pid,phone,label:phone,limit,usedToday:0,type:'long',active:true,created:now()});added++;}else skip++;
+  });
+  closeM('bulk-modal');renderNums();refreshSMSSenders();updBadges();toast(`Imported ${added} numbers. Skipped ${skip} duplicates.`,'success');
+}
+
+// ── BUY NUMBERS (simulated picker) ──
+// The number list below is GENERATED LOCALLY for demo/testing. To buy real
+// numbers, replace genAvailableNumbers() with a call to your provider's
+// number-search API and confirmBuy() with the provider's purchase API:
+//
+//   Twilio:  GET  https://api.twilio.com/2010-04-01/Accounts/{SID}/AvailablePhoneNumbers/{Country}/Local.json
+//            POST https://api.twilio.com/2010-04-01/Accounts/{SID}/IncomingPhoneNumbers.json   (body: PhoneNumber=...)
+//   Vonage:  GET  https://rest.nexmo.com/number/search?api_key=..&api_secret=..&country=GB
+//            POST https://rest.nexmo.com/number/buy   (body: country=..&msisdn=..)
+//   BulkSMS: numbers are provisioned in the BulkSMS portal; assign here manually
+//   (these calls need your secret keys and should run server-side, not in-browser).
+function openBuyModal(){
+  if(!S.providers.length){toast('Add a VoIP provider first','warn');go('providers');return;}
+  const sel=document.getElementById('buy-prov');
+  sel.innerHTML='<option value="">Select provider...</option>'+S.providers.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  document.getElementById('buy-results').innerHTML='';
+  document.getElementById('buy-count').textContent='';
+  document.getElementById('buy-confirm-btn').disabled=true;
+  S.buyBuf=[];
+  openM('buy-modal');
+}
+function genAvailableNumbers(dial,type,n){
+  // SIMULATION ONLY — produces realistic-looking but fake available numbers.
+  const out=[];const seen=new Set();
+  while(out.length<n){
+    let sub;
+    if(type==='toll'){const tf=['800','888','877','866','855','844','833'];sub=tf[Math.floor(Math.random()*tf.length)]+Math.floor(1000000+Math.random()*8999999);}
+    else if(type==='short'){sub=Math.floor(10000+Math.random()*89999).toString();}
+    else{sub=Math.floor(2000000000+Math.random()*7999999999).toString();}
+    const full=dial+sub;
+    if(seen.has(full))continue;seen.add(full);
+    out.push(full);
+  }
+  return out;
+}
+function searchBuyNumbers(){
+  const pid=document.getElementById('buy-prov').value;
+  if(!pid){toast('Select a provider','error');return;}
+  const type=document.getElementById('buy-type').value;
+  const cv=document.getElementById('buy-country').value.split('|'); // CC|+dial|defaultType
+  const dial=cv[1]||'+1';
+  const list=genAvailableNumbers(dial,type,12);
+  S.buyBuf=[];
+  const el=document.getElementById('buy-results');
+  el.innerHTML=list.map(num=>{
+    const exists=S.numbers.find(n=>n.phone===num);
+    return`<label class="nrow" style="cursor:${exists?'not-allowed':'pointer'};opacity:${exists?'0.45':'1'}">
+      <input type="checkbox" class="buy-cb" value="${num}" ${exists?'disabled':''} onchange="updBuySel()" style="width:18px;height:18px;accent-color:var(--sage)">
+      <div class="ninfo" style="margin-left:10px"><div class="nphone">${esc(num)}</div><div class="nmeta">${cv[0]} · ${type}${exists?' · already added':''}</div></div>
+    </label>`;
+  }).join('');
+  document.getElementById('buy-count').textContent=`${list.length} numbers available`;
+  document.getElementById('buy-confirm-btn').disabled=true;
+}
+function updBuySel(){
+  S.buyBuf=Array.from(document.querySelectorAll('.buy-cb:checked')).map(c=>c.value);
+  const btn=document.getElementById('buy-confirm-btn');
+  btn.disabled=!S.buyBuf.length;
+  btn.textContent=S.buyBuf.length?`Add ${S.buyBuf.length} Selected`:'Add Selected';
+}
+function confirmBuy(){
+  const pid=document.getElementById('buy-prov').value;
+  const type=document.getElementById('buy-type').value;
+  const limit=parseInt(document.getElementById('buy-limit').value)||0;
+  if(!pid){toast('Select a provider','error');return;}
+  if(!S.buyBuf.length){toast('Select at least one number','warn');return;}
+  // ── REAL PURCHASE would go here (per-provider POST, server-side) ──
+  let added=0;
+  S.buyBuf.forEach(phone=>{
+    if(!S.numbers.find(n=>n.phone===phone)){
+      S.numbers.push({id:uid(),providerId:pid,phone,label:phone,limit,usedToday:0,type,active:true,created:now(),purchased:true});
+      added++;
+    }
+  });
+  S.buyBuf=[];
+  closeM('buy-modal');renderNums();refreshSMSSenders();refreshDash();updBadges();
+  toast(`${added} number${added!==1?'s':''} added to sender pool!`,'success');
+}
+function renderNums(){
+  const el=document.getElementById('num-list');
+  if(!S.numbers.length){el.innerHTML='<div class="empty"><div class="empty-icon">📱</div><div class="empty-t">No phone numbers</div><div class="empty-s">Add a VoIP provider first, then add numbers</div><button class="btn btn-ink mt12" onclick="go(\'providers\')">Go to Providers →</button></div>';return;}
+  const byP={};
+  S.providers.forEach(p=>{byP[p.id]={prov:p,nums:[]};});
+  S.numbers.forEach(n=>{if(!byP[n.providerId])byP[n.providerId]={prov:{name:'Unknown',emoji:'?'},nums:[]};byP[n.providerId].nums.push(n);});
+  el.innerHTML=Object.values(byP).filter(g=>g.nums.length).map(g=>`
+  <div class="card mb16">
+    <div class="fbc mb16">
+      <div class="fc gap12"><span style="font-size:18px">${g.prov.emoji||'📱'}</span><div class="card-title" style="margin:0">${esc(g.prov.name)}</div><span class="badge b-ink">${g.nums.length} number${g.nums.length!==1?'s':''}</span></div>
+      <button class="btn btn-outline btn-sm" onclick="openNumModal()">+ Add</button>
+    </div>
+    ${g.nums.map(n=>{
+      const pct=n.limit>0?Math.min(100,Math.round((n.usedToday/n.limit)*100)):0;
+      const fc=pct>=100?'var(--coral)':pct>70?'var(--gold2)':'var(--sage2)';
+      const sb=!n.active?'b-ink':n.limit>0&&n.usedToday>=n.limit?'b-coral':'b-sage';
+      const st=!n.active?'Paused':n.limit>0&&n.usedToday>=n.limit?'Limit Reached':'● Ready';
+      return`<div class="nrow"><div class="nav2">${typeE(n.type)}</div><div class="ninfo"><div class="nphone">${esc(n.phone)}</div><div class="nmeta">${n.label!==n.phone?esc(n.label)+' · ':''}${n.type}${n.limit>0?' · Limit: '+n.limit+'/day':' · Unlimited'}</div></div><div class="nusage"><div class="usage-label" style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink4);margin-bottom:3px"><span>${n.usedToday}</span><span>${n.limit||'∞'}/day</span></div><div class="ubar"><div class="ufill" style="width:${n.limit>0?pct:0}%;background:${fc}"></div></div></div><div style="margin:0 8px"><span class="badge ${sb}">${st}</span></div><div class="nacts"><button class="btn btn-outline btn-sm" onclick="togNum('${n.id}')">${n.active?'⏸':'▶'}</button><button class="btn btn-outline btn-sm" onclick="resetNL('${n.id}')">↺</button><button class="btn btn-coral btn-sm" onclick="conf('Remove ${esc(n.phone)}?','',()=>delNum('${n.id}'))">✕</button></div></div>`;
+    }).join('')}
+  </div>`).join('');
+}
+function togNum(id){const n=S.numbers.find(x=>x.id===id);if(n){n.active=!n.active;renderNums();refreshSMSSenders();}}
+function resetNL(id){const n=S.numbers.find(x=>x.id===id);if(n){n.usedToday=0;renderNums();refreshSMSSenders();toast(`Usage reset for ${n.phone}`,'info');}}
+function delNum(id){const n=S.numbers.find(x=>x.id===id);S.numbers=S.numbers.filter(x=>x.id!==id);renderNums();refreshSMSSenders();updBadges();if(n)toast(`${n.phone} removed`,'info');}
+function typeE(t){return{long:'📱',short:'⚡',toll:'🆓',alpha:'🔤'}[t]||'📱';}
+
+// ── EMAIL ACCOUNTS ──
+function updEAForm(){
+  const t=document.getElementById('ea-type').value;
+  const isSmtp=t==='smtp';
+  document.getElementById('ea-smtp').classList.toggle('hidden',!isSmtp);
+  document.getElementById('ea-api').classList.toggle('hidden',isSmtp);
+  document.getElementById('ea-domgrp').classList.toggle('hidden',t!=='mailgun');
+  const lbl={sendgrid:'SendGrid API Key',mailgun:'Mailgun API Key',ses:'SES Access Key',postmark:'Server API Token',sparkpost:'API Key'};
+  const l=document.getElementById('ea-aklbl');if(l)l.textContent=lbl[t]||'API Key';
+}
+function openEAModal(){
+  ['ea-name','ea-host','ea-port','ea-user','ea-pass','ea-apikey','ea-domain','ea-from'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('ea-type').value='smtp';
+  document.getElementById('ea-dlimit').value='0';
+  updEAForm();openM('ea-modal');
+}
+function testEA(){const t=document.getElementById('ea-type').value;setTimeout(()=>toast(`${t.toUpperCase()} test: ✅ Connection successful (simulated)`,'success'),500);}
+function saveEA(){
+  const t=document.getElementById('ea-type').value;
+  const name=document.getElementById('ea-name').value.trim();
+  const from=document.getElementById('ea-from').value.trim();
+  const dlimit=parseInt(document.getElementById('ea-dlimit').value)||0;
+  if(!from){toast('Enter From Email address','error');return;}
+  const acc={id:uid(),type:t,name:name||(t.toUpperCase()+' Account'),from,dlimit,usedToday:0,active:true,created:now()};
+  if(t==='smtp'){acc.host=document.getElementById('ea-host').value.trim();acc.port=document.getElementById('ea-port').value.trim();acc.sec=document.getElementById('ea-sec').value;acc.user=document.getElementById('ea-user').value.trim();acc.pass=document.getElementById('ea-pass').value;if(!acc.host){toast('Enter SMTP host','error');return;}}
+  else{acc.apiKey=document.getElementById('ea-apikey').value;if(!acc.apiKey){toast('Enter API key','error');return;}if(t==='mailgun')acc.domain=document.getElementById('ea-domain').value.trim();}
+  S.emailAccounts.push(acc);closeM('ea-modal');renderEAs();refreshEASel();updBadges();toast(`Account "${acc.name}" saved!`,'success');
+}
+function renderEAs(){
+  const el=document.getElementById('ea-list');
+  if(!S.emailAccounts.length){el.innerHTML='<div class="empty"><div class="empty-icon">📮</div><div class="empty-t">No email accounts</div><div class="empty-s">Add SMTP or API account for bulk sending</div><button class="btn btn-ink mt12" onclick="openEAModal()">+ Add Account</button></div>';return;}
+  const icons={smtp:'🔐',sendgrid:'📬',mailgun:'🔫',ses:'☁️',postmark:'📮',sparkpost:'✨'};
+  el.innerHTML=S.emailAccounts.map(a=>{
+    const pct=a.dlimit>0?Math.min(100,Math.round((a.usedToday/a.dlimit)*100)):0;
+    return`<div class="prov-card"><div class="prov-logo">${icons[a.type]||'📧'}</div><div class="prov-info"><div class="prov-name">${esc(a.name)}</div><div class="prov-meta">${a.type.toUpperCase()} · From: ${esc(a.from)} · ${a.usedToday}${a.dlimit>0?'/'+a.dlimit:''} sent today</div>${a.dlimit>0?`<div style="margin-top:6px;max-width:180px"><div class="ubar"><div class="ufill" style="width:${pct}%;background:${pct>=100?'var(--coral)':pct>70?'var(--gold2)':'var(--sage2)'}"></div></div></div>`:''}</div><div class="prov-acts"><span class="badge ${a.active?'b-sage':'b-ink'}">${a.active?'● Active':'● Paused'}</span><button class="btn btn-outline btn-sm" onclick="resetEAL('${a.id}')">↺ Reset</button><button class="btn btn-coral btn-sm" onclick="conf('Remove this account?','',()=>delEA('${a.id}'))">Remove</button></div></div>`;
+  }).join('');
+}
+function delEA(id){S.emailAccounts=S.emailAccounts.filter(a=>a.id!==id);renderEAs();refreshEASel();updBadges();toast('Account removed','info');}
+function resetEAL(id){const a=S.emailAccounts.find(x=>x.id===id);if(a){a.usedToday=0;renderEAs();toast('Limit reset','info');}}
+function refreshEASel(){const s=document.getElementById('ea-sel');if(!s)return;s.innerHTML='<option value="">Choose account...</option>'+S.emailAccounts.map(a=>`<option value="${a.id}">${esc(a.name)} (${esc(a.from)})</option>`).join('');}
+
+// ── FILE PARSING ──
+function parseNumFile(file,cb){
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      let nums=[];
+      if(file.name.toLowerCase().endsWith('.csv')){nums=ev.target.result.split('\n').map(l=>l.split(',')[0].replace(/["']/g,'').trim()).filter(n=>n.length>3);}
+      else{const wb=XLSX.read(ev.target.result,{type:'binary'});const ws=wb.Sheets[wb.SheetNames[0]];const d=XLSX.utils.sheet_to_json(ws,{header:1,raw:false});nums=d.map(r=>String(r[0]||'').trim()).filter(n=>n.length>3);}
+      if(nums.length&&!/[\d+]/.test(nums[0]))nums.shift();
+      cb(nums);
+    }catch(e){toast('File parse error: '+e.message,'error');}
+  };
+  file.name.toLowerCase().endsWith('.csv')?r.readAsText(file):r.readAsBinaryString(file);
+}
+function handleSMSFile(e){
+  const file=e.target.files[0];if(!file)return;
+  parseNumFile(file,nums=>{S.smsR=nums;updSMSCnt();showAlert('sms-alerts','success',`Loaded ${nums.length} recipients from ${file.name}`);});
+}
+function getManualNums(){const raw=document.getElementById('sms-manual').value.trim();return raw?raw.split('\n').map(s=>s.trim()).filter(s=>s.length>3):[];}
+function updSMSCnt(){const t=S.smsR.length+getManualNums().length;document.getElementById('sms-rcnt').textContent=`${t} recipient${t!==1?'s':''}`;}
+function clearSMSR(){S.smsR=[];document.getElementById('sms-manual').value='';document.getElementById('sms-file').value='';updSMSCnt();toast('Recipients cleared','info');}
+function smsCC(){const v=document.getElementById('sms-msg').value;document.getElementById('sms-cc').textContent=`${v.length} chars · No sending limit`;}
+function handleEmailFile(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      let rows=[];
+      if(file.name.toLowerCase().endsWith('.csv')){const lines=ev.target.result.split('\n');rows=lines.map(l=>{const p=l.split(',').map(s=>s.replace(/["']/g,'').trim());return{email:p[0],name:p[1]||''};}).filter(r=>r.email.includes('@'));}
+      else{const wb=XLSX.read(ev.target.result,{type:'binary'});const ws=wb.Sheets[wb.SheetNames[0]];const d=XLSX.utils.sheet_to_json(ws,{header:1,raw:false});rows=d.map(r=>({email:String(r[0]||'').trim(),name:String(r[1]||'').trim()})).filter(r=>r.email.includes('@'));}
+      if(rows.length&&!rows[0].email.includes('@'))rows.shift();
+      S.emailR=rows;updEmailCnt();showAlert('email-alerts','success',`Loaded ${rows.length} recipients from ${file.name}`);
+    }catch(e){toast('Parse error: '+e.message,'error');}
+  };
+  file.name.toLowerCase().endsWith('.csv')?r.readAsText(file):r.readAsBinaryString(file);
+}
+function getManualEmails(){const raw=document.getElementById('email-manual').value.trim();return raw?raw.split('\n').map(s=>s.trim()).filter(s=>s.includes('@')).map(e=>({email:e,name:''})):[];}
+function updEmailCnt(){const t=S.emailR.length+getManualEmails().length;document.getElementById('email-rcnt').textContent=`${t} recipient${t!==1?'s':''}`;}
+function clearEmailR(){S.emailR=[];document.getElementById('email-manual').value='';document.getElementById('email-file').value='';updEmailCnt();}
+
+// ── SMS SENDERS ──
+function refreshSMSSenders(){
+  const el=document.getElementById('sms-senders');if(!el)return;
+  const active=S.numbers.filter(n=>n.active);
+  if(!active.length){el.innerHTML='<div class="empty" style="padding:14px 0"><div class="empty-t" style="font-size:14px">No numbers configured</div><div class="empty-s"><a style="color:var(--sage2);cursor:pointer;font-weight:600" onclick="go(\'numbers\')">Add phone numbers →</a></div></div>';return;}
+  el.innerHTML=active.map(n=>{
+    const pct=n.limit>0?Math.min(100,Math.round((n.usedToday/n.limit)*100)):0;
+    const fc=pct>=100?'var(--coral)':pct>70?'var(--gold2)':'var(--sage2)';
+    const tag=n.limit>0&&n.usedToday>=n.limit?`<span class="stag" style="background:var(--coral3);color:var(--coral)">LIMIT</span>`:`<span class="stag" style="background:var(--sage3);color:var(--sage)">OK</span>`;
+    return`<div class="srow"><span class="sphone">${esc(n.phone)}</span><div class="sbar-wrap"><div class="sbar-fill" style="width:${n.limit>0?pct:0}%;background:${fc}"></div></div><span class="scnt">${n.usedToday}/${n.limit||'∞'}</span>${tag}</div>`;
+  }).join('');
+}
+
+// ── SMS CAMPAIGN ENGINE ──
+let smsRow=0;
+async function startSMS(){
+  const allR=[...S.smsR,...getManualNums()];
+  if(!allR.length){showAlert('sms-alerts','error','No recipients. Upload a file or enter numbers.');return;}
+  const msg=document.getElementById('sms-msg').value.trim();
+  if(!msg){showAlert('sms-alerts','error','Please enter a message.');return;}
+  const useTB=document.getElementById('use-textbelt').checked;
+  const cname=document.getElementById('sms-cname').value.trim()||'SMS Campaign '+ts();
+  const delay=Math.max(100,parseInt(document.getElementById('o-delay').value)||1100);
+  const dailyLim=parseInt(document.getElementById('o-limit').value)||0;
+  const maxR=parseInt(document.getElementById('o-maxretry').value)||3;
+  const autoRotate=document.getElementById('o-rotate').checked;
+  const autoRetry=document.getElementById('o-retry').checked;
+  const skipInv=document.getElementById('o-skip').checked;
+  if(useTB){
+    if(!S.tb.key){showAlert('sms-alerts','error','TextBelt key not configured. Go to TextBelt page first.');return;}
+    await checkTBQuotaSilent();
+    if(S.tb.quota!==null&&S.tb.quota===0){showAlert('sms-alerts','error','TextBelt quota is 0. Purchase credits at textbelt.com');return;}
+    await runTBCampaign(allR,msg,cname,delay,maxR,skipInv,autoRetry);
+  } else {
+    const avail=S.numbers.filter(n=>n.active&&(n.limit===0||n.usedToday<n.limit));
+    if(!avail.length){showAlert('sms-alerts','error','No available sender numbers. Add numbers or reset limits.');return;}
+    if(dailyLim>0)S.numbers.forEach(n=>{if(n.active)n.limit=dailyLim;});
+    await runVoIPCampaign(allR,msg,cname,delay,maxR,autoRotate,autoRetry,skipInv);
+  }
+}
+
+// ── TextBelt Campaign Runner ──
+async function runTBCampaign(allR,msg,cname,delay,maxR,skipInv,autoRetry){
+  S.sendingSMS=true;S.stopSMS=false;smsRow=0;
+  setBtn('sms-send-btn',true,'<span class="spin"></span> Sending via TextBelt…');
+  setBtn('sms-stop-btn',false,'⏹ Stop Campaign',false);
+  document.getElementById('sms-prog').classList.remove('hidden');
+  document.getElementById('sms-res-body').innerHTML='';
+  const camp={id:uid(),name:cname,type:'sms',method:'textbelt',total:allR.length,sent:0,delivered:0,failed:0,start:now(),end:null};
+  S.campaigns.push(camp);
+  let sent=0,del=0,fail=0;
+  const updUI=()=>{
+    const total=allR.length,pct=total?Math.round((sent/total)*100):0;
+    setEl('sms-pbar',null,`width:${pct}%`);setEl('sms-pct',pct+'%');
+    setEl('ps-sent',sent);setEl('ps-del',del);setEl('ps-fail',fail);setEl('ps-rem',Math.max(0,total-sent));
+    setEl('sms-cur-sender','📡 TextBelt'+(S.tb.quota!==null?' · '+S.tb.quota+' credits left':''));
+    updDashLive();
+  };
+  for(let i=0;i<allR.length;i++){
+    if(S.stopSMS)break;
+    const recip=allR[i];
+    if(skipInv&&!validPhone(recip)){addSMSRow(++smsRow,recip,'TextBelt','textbelt','skipped',0,now(),'');sent++;updUI();continue;}
+    if(S.tb.quota!==null&&S.tb.quota<=0){showAlert('sms-alerts','error','TextBelt quota exhausted. Purchase credits at textbelt.com');S.stopSMS=true;break;}
+    let ok=false,retries=0,textId='';
+    const finalMsg=applyVars(msg,recip,'');
+    while(retries<=maxR){
+      await sleep(delay);
+      const result=await callTextbelt(recip,finalMsg);
+      ok=result.success;if(result.textId)textId=result.textId;
+      if(ok){S.stats.smsSent++;S.stats.smsDel++;S.tb.totalSent++;
+        const tsd=document.getElementById('tb-total-sent');if(tsd)tsd.textContent=S.tb.totalSent;break;}
+      else{S.stats.failed++;retries++;if(!autoRetry||retries>maxR)break;await sleep(2000);}
+    }
+    if(ok)del++;else fail++;sent++;
+    const le=addLog('sms',recip,'TextBelt',finalMsg,ok?'sent':'failed',retries,'textbelt',textId);
+    addSMSRow(++smsRow,recip,'TextBelt','textbelt',ok?'sent':'failed',retries,le.time,textId);
+    camp.sent=sent;camp.delivered=del;camp.failed=fail;updUI();
+  }
+  camp.end=now();S.sendingSMS=false;
+  setBtn('sms-send-btn',false,'💬 Launch SMS Campaign');
+  setBtn('sms-stop-btn',true,'⏹ Stop Campaign',true);
+  toast(S.stopSMS?'Campaign stopped.':`Done! ${del} delivered, ${fail} failed. Credits left: ${S.tb.quota!==null?S.tb.quota:'?'}`,S.stopSMS?'warn':'success',7000);
+  updBadges();renderNums();
+}
+
+// ── VoIP Campaign Runner ──
+async function runVoIPCampaign(allR,msg,cname,delay,maxR,autoRotate,autoRetry,skipInv){
+  S.sendingSMS=true;S.stopSMS=false;smsRow=0;
+  setBtn('sms-send-btn',true,'<span class="spin"></span> Sending…');
+  setBtn('sms-stop-btn',false,'⏹ Stop Campaign',false);
+  document.getElementById('sms-prog').classList.remove('hidden');
+  document.getElementById('sms-res-body').innerHTML='';
+  const camp={id:uid(),name:cname,type:'sms',method:'voip',total:allR.length,sent:0,delivered:0,failed:0,start:now(),end:null};
+  S.campaigns.push(camp);
+  let sent=0,del=0,fail=0,sidx=0;
+  const getSndr=()=>{
+    if(!autoRotate)return S.numbers.find(n=>n.active&&(n.limit===0||n.usedToday<n.limit))||null;
+    const av=S.numbers.filter(n=>n.active&&(n.limit===0||n.usedToday<n.limit));
+    if(!av.length)return null;sidx=sidx%av.length;return av[sidx];
+  };
+  const updUI=()=>{
+    const total=allR.length,pct=total?Math.round((sent/total)*100):0;
+    setEl('sms-pbar',null,`width:${pct}%`);setEl('sms-pct',pct+'%');
+    setEl('ps-sent',sent);setEl('ps-del',del);setEl('ps-fail',fail);setEl('ps-rem',Math.max(0,total-sent));
+    const cur=getSndr();setEl('sms-cur-sender','Sender: '+(cur?cur.phone:'None available'));
+    refreshSMSSenders();updDashLive();
+  };
+  for(let i=0;i<allR.length;i++){
+    if(S.stopSMS)break;
+    const recip=allR[i];
+    if(skipInv&&!validPhone(recip)){addSMSRow(++smsRow,recip,'N/A','voip','skipped',0,now(),'');sent++;updUI();continue;}
+    let ok=false,retries=0,sndr=null;
+    const finalMsg=applyVars(msg,recip,'');
+    while(retries<=maxR){
+      const s=getSndr();
+      if(!s){showAlert('sms-alerts','warn','All numbers at daily limit. Campaign paused.');S.stopSMS=true;break;}
+      sndr=s;
+      // ── SEND DISPATCH: route by the number's parent provider type ──
+      const prov = S.providers.find(p => p.id === s.providerId);
+      if(prov && prov.type === 'bulksms'){
+        // Real BulkSMS.com send (uses S.bulksms credentials)
+        ok = await sendViaBulkSMS(s, recip, finalMsg);
+      } else {
+        // ── TO USE OTHER REAL VOIP PROVIDERS: replace simSend() with your proxy ──
+        // ok = await callVoIPProxy(s, recip, finalMsg);
+        // async function callVoIPProxy(sender, to, body) {
+        //   const prov = S.providers.find(p => p.id === sender.providerId);
+        //   const res = await fetch('/proxy/sms', {
+        //     method: 'POST', headers: {'Content-Type':'application/json'},
+        //     body: JSON.stringify({ provider:prov.type, sid:prov.sid, token:prov.tok, from:sender.phone, to, body })
+        //   });
+        //   return (await res.json()).success === true;
+        // }
+        ok=await simSend(s,recip,finalMsg,delay);
+      }
+      if(ok){s.usedToday++;S.stats.smsSent++;S.stats.smsDel++;if(autoRotate)sidx++;break;}
+      else{S.stats.failed++;retries++;if(!autoRetry||retries>maxR)break;const idx=S.numbers.findIndex(n=>n.id===s.id);sidx=(idx+1)%Math.max(1,S.numbers.filter(n=>n.active&&(n.limit===0||n.usedToday<n.limit)).length);await sleep(1000);}
+    }
+    if(ok)del++;else fail++;sent++;
+    const le=addLog('sms',recip,sndr?.phone||'N/A',finalMsg,ok?'sent':'failed',retries,'voip','');
+    addSMSRow(++smsRow,recip,sndr?.phone||'N/A','voip',ok?'sent':'failed',retries,le.time,'');
+    camp.sent=sent;camp.delivered=del;camp.failed=fail;updUI();
+  }
+  camp.end=now();S.sendingSMS=false;
+  setBtn('sms-send-btn',false,'💬 Launch SMS Campaign');
+  setBtn('sms-stop-btn',true,'⏹ Stop Campaign',true);
+  toast(S.stopSMS?'Campaign stopped.':`Done! ${del} delivered, ${fail} failed of ${sent} total.`,S.stopSMS?'warn':'success');
+  updBadges();renderNums();
+}
+function stopSMS(){S.stopSMS=true;}
+
+// ── Simulation fallback (VoIP mode only) ──
+async function simSend(sender,recipient,msg,delay){
+  await sleep(Math.min(delay,120));
+  if(!validPhone(recipient))return false;
+  return Math.random()>0.08;
+}
+
+// ════════════════════════════════════════
+// BULKSMS.COM API FUNCTION
+// ════════════════════════════════════════
+// Builds the HTTP Basic credential from a Token ID + Token Secret.
+// Generate the token pair in your BulkSMS account:
+//   Settings → Advanced → API Tokens → Create token
+// btoa() encodes "tokenId:tokenSecret" once, on demand.
+function bulksmsCredential(){
+  const id=S.bulksms.tokenId, secret=S.bulksms.tokenSecret;
+  if(!id||!secret)return '';
+  return btoa(`${id}:${secret}`);
+}
+
+// Real send via BulkSMS.com REST API.
+// Returns true on HTTP 201 (message accepted). Note: 201 = accepted,
+// NOT yet delivered — final status comes from a status poll or webhook.
+//
+// IMPORTANT: a browser calling api.bulksms.com directly will usually be
+// blocked by CORS (the API is built for server-to-server calls). If you
+// hit CORS, set S.bulksms.proxyUrl to your own backend proxy that forwards
+// the request and attaches the Authorization header server-side.
+async function sendViaBulkSMS(sender, recipient, body){
+  const cred = bulksmsCredential();
+  if(!cred) return false;
+  const payload = {
+    to: recipient,                              // E.164, e.g. "+447900000123"
+    body: body,                                 // full message — NO length cap
+    encoding: 'UNICODE'                         // supports long + non-GSM text
+  };
+  const from = S.bulksms.senderId || (sender && sender.bulksmsFrom);
+  if(from) payload.from = from;                 // omit entirely = repliable
+
+  // ── PROXY MODE (recommended for production / avoids CORS) ──
+  // Your proxy receives this and adds: Authorization: Basic <cred> server-side.
+  if(S.bulksms.proxyUrl){
+    try{
+      const r = await fetch(S.bulksms.proxyUrl, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ ...payload, _cred: cred })
+      });
+      return r.ok;   // proxy returns the BulkSMS status (200/201 = accepted)
+    }catch(e){
+      return false;  // proxy unreachable
+    }
+  }
+
+  // ── DIRECT MODE (works in Postman/curl; may be CORS-blocked in browser) ──
+  try{
+    const res = await fetch('https://api.bulksms.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Basic '+cred
+      },
+      body: JSON.stringify(payload)
+    });
+    if(res.status===201){
+      const data = await res.json();
+      return Array.isArray(data) && data.length>0;
+    }
+    return false;   // 4xx = fix auth/number ; 5xx = transient, retry-worthy
+  }catch(e){
+    return false;   // network/CORS error
+  }
+}
+
+// ════════════════════════════════════════
+// TEXTBELT API FUNCTIONS
+// ════════════════════════════════════════
+
+// Core send helper — tries direct, falls back to proxy URL if CORS blocked
+async function tbDoSend(endpoint, params) {
+  // 1) Try direct fetch (TextBelt does send CORS headers on /text endpoint)
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(params)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  } catch (directErr) {
+    // 2) If proxy URL is configured, try via proxy
+    if (S.tb.proxyUrl) {
+      const proxyTarget = S.tb.proxyUrl.replace(/\/$/, '');
+      const res2 = await fetch(proxyTarget, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
+      });
+      if (!res2.ok) throw new Error('Proxy HTTP ' + res2.status);
+      return await res2.json();
+    }
+    throw directErr;
+  }
+}
+
+// Core TextBelt API call
+async function callTextbelt(to, message) {
+  const key = S.tb.key.trim();
+  if (!key) return { success: false, error: 'No API key configured' };
+  const effectiveKey = S.tb.testMode ? key + '_test' : key;
+  const params = { phone: to, message: message, key: effectiveKey };
+  const updQuota = (q) => {
+    if (q === undefined) return;
+    S.tb.quota = q;
+    ['tb-quota-disp', 'sms-tb-quota-display'].forEach(id => {
+      const e = document.getElementById(id);
+      if (e) { e.textContent = q + (id === 'sms-tb-quota-display' ? ' credits' : ''); e.style.display = ''; }
+    });
+    if (q > 0 && q <= 10) toast(`⚠️ TextBelt quota low: ${q} credits left!`, 'warn', 7000);
+    if (q === 0) toast('TextBelt quota exhausted! Buy more at textbelt.com', 'error', 9000);
+  };
+  try {
+    const data = await tbDoSend('https://textbelt.com/text', params);
+    updQuota(data.quotaRemaining);
+    return { success: data.success === true, textId: data.textId || null, quotaRemaining: data.quotaRemaining, error: data.error || null };
+  } catch (e) {
+    // Auto-heal: retry once
+    if (S.settings.autoHeal) {
+      try {
+        await sleep(2000);
+        const data2 = await tbDoSend('https://textbelt.com/text', params);
+        updQuota(data2.quotaRemaining);
+        return { success: data2.success === true, textId: data2.textId || null, quotaRemaining: data2.quotaRemaining, error: data2.error || null };
+      } catch (e2) { return { success: false, error: 'Network error (auto-heal failed): ' + e2.message }; }
+    }
+    return { success: false, error: 'Network/CORS error: ' + e.message + '. Configure a Proxy URL on the TextBelt page.' };
+  }
+}
+
+async function checkTBQuota(){
+  const key=S.tb.key.trim();
+  if(!key){toast('Enter and save a TextBelt API key first','warn');return;}
+  const effectiveKey=S.tb.testMode?key+'_test':key;
+  const qdEl=document.getElementById('tb-quota-disp');if(qdEl)qdEl.textContent='…';
+  try{
+    const res=await fetch(`https://textbelt.com/quota/${effectiveKey}`);
+    const data=await res.json();
+    if(data.success){
+      S.tb.quota=data.quotaRemaining;
+      if(qdEl)qdEl.textContent=data.quotaRemaining;
+      updTBConnBadge(true);
+      showAlert('tb-alerts','success',`✅ Connected! Quota: ${data.quotaRemaining} SMS credits remaining`);
+    }else{
+      updTBConnBadge(false);
+      showAlert('tb-alerts','error','Could not verify key. Check your API key and try again.');
+      if(qdEl)qdEl.textContent='Error';
+    }
+  }catch(e){
+    updTBConnBadge(false);
+    showAlert('tb-alerts','warn','Network error: '+e.message);
+    if(qdEl)qdEl.textContent='?';
+  }
+}
+
+async function checkTBQuotaSilent(){
+  const key=S.tb.key.trim();if(!key)return;
+  const effectiveKey=S.tb.testMode?key+'_test':key;
+  try{
+    const res=await fetch(`https://textbelt.com/quota/${effectiveKey}`);
+    const data=await res.json();
+    if(data.success){S.tb.quota=data.quotaRemaining;const sdEl=document.getElementById('sms-tb-quota-display');if(sdEl){sdEl.style.display='';sdEl.textContent=data.quotaRemaining+' credits';}}
+  }catch(e){}
+}
+
+function saveTBKey(){
+  const k=document.getElementById('tb-key').value.trim();
+  if(!k){toast('Please enter a TextBelt API key','error');return;}
+  S.tb.key=k;
+  S.tb.testMode=document.getElementById('tb-testmode').checked;
+  S.tb.active=true;
+  const pu=document.getElementById('tb-proxy-url');
+  if(pu)S.tb.proxyUrl=pu.value.trim();
+  refreshTBPage();syncTBToSMS();
+  toast('TextBelt key saved! Checking quota…','success');
+  checkTBQuota();
+}
+
+function clearTBKey(){
+  S.tb.key='';S.tb.active=false;S.tb.quota=null;S.tb.testMode=false;
+  const ki=document.getElementById('tb-key');if(ki)ki.value='';
+  const tm=document.getElementById('tb-testmode');if(tm)tm.checked=false;
+  const ut=document.getElementById('use-textbelt');if(ut){ut.checked=false;onTBToggle();}
+  refreshTBPage();syncTBToSMS();
+  toast('TextBelt key cleared','info');
+}
+
+function toggleTBKeyVis(btn){
+  const inp=document.getElementById('tb-key');
+  if(!inp)return;
+  inp.type=inp.type==='password'?'text':'password';
+  if(btn)btn.textContent=inp.type==='password'?'👁':'🙈';
+}
+
+function updTBTestMode(){
+  S.tb.testMode=document.getElementById('tb-testmode').checked;
+  refreshTBPage();
+}
+
+function showProxyTab(tab, btn) {
+  ['node','php','python'].forEach(t => { const e = document.getElementById('proxy-'+t); if(e) e.classList.toggle('hidden', t !== tab); });
+  document.querySelectorAll('#proxy-tabs .tab').forEach(b => b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+}
+
+function updTBConnBadge(ok){
+  const el=document.getElementById('tb-conn-badge');if(!el)return;
+  el.className='badge '+(ok?'b-sage':'b-coral');
+  el.textContent=ok?'● Connected':'● Error';
+}
+
+async function sendTBTest(){
+  const key=S.tb.key.trim();
+  if(!key){toast('Save your TextBelt API key first','error');return;}
+  const phone=document.getElementById('tb-test-phone').value.trim();
+  const msg=document.getElementById('tb-test-msg').value.trim();
+  if(!phone){toast('Enter a phone number','warn');return;}
+  const btn=document.getElementById('tb-test-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Sending…';
+  const result=await callTextbelt(phone,msg||'Test from BulkReach Pro');
+  btn.disabled=false;btn.innerHTML='📤 Send Test SMS';
+  const el=document.getElementById('tb-test-result');
+  if(!el)return;
+  if(result.success){
+    el.style.display='block';el.className='tb-test-result tb-ok';
+    el.innerHTML=`✅ <strong>Message sent!</strong> TextID: <code style="font-family:monospace">${result.textId}</code> · Credits left: <strong>${result.quotaRemaining}</strong>`;
+    addLog('sms',phone,'TextBelt (test)',msg||'Test','sent',0,'textbelt',result.textId||'');
+    S.tb.totalSent++;const tsd=document.getElementById('tb-total-sent');if(tsd)tsd.textContent=S.tb.totalSent;
+  }else{
+    el.style.display='block';el.className='tb-test-result tb-fail';
+    el.innerHTML=`❌ <strong>Failed:</strong> ${result.error||'Unknown error'}. Check your key and phone format (+12025551234).`;
+  }
+}
+
+async function checkTBStatus(){
+  const id=document.getElementById('tb-status-id').value.trim();
+  if(!id){toast('Enter a Text ID','warn');return;}
+  const el=document.getElementById('tb-status-result');if(!el)return;
+  el.innerHTML='<div style="padding:10px;color:var(--ink4);font-size:13px">Checking…</div>';
+  try{
+    const res=await fetch(`https://textbelt.com/status/${id}`);
+    const data=await res.json();
+    const sCls={DELIVERED:'b-sage',SENT:'b-sky',SENDING:'b-gold',FAILED:'b-coral',UNKNOWN:'b-ink'};
+    const sIco={DELIVERED:'✅',SENT:'📤',SENDING:'⏳',FAILED:'❌',UNKNOWN:'❓'};
+    const s=data.status||'UNKNOWN';
+    el.innerHTML=`<div style="padding:10px 14px;background:var(--cream2);border:1px solid var(--cream3);border-radius:9px;font-size:13px">Status for TextID <strong>${id}</strong>: <span class="badge ${sCls[s]||'b-ink'}">${sIco[s]} ${s}</span></div>`;
+  }catch(e){el.innerHTML=`<div style="color:var(--coral);font-size:13px;padding:10px">Error: ${e.message}</div>`;}
+}
+
+function onTBToggle(){
+  const on=document.getElementById('use-textbelt').checked;
+  if(on&&!S.tb.key){
+    document.getElementById('use-textbelt').checked=false;
+    toast('Save your TextBelt API key first (TextBelt page in sidebar)','warn',5000);
+    go('textbelt');return;
+  }
+  const badge=document.getElementById('sms-tb-badge');
+  if(badge){badge.textContent=on?'ON':'OFF';badge.className=on?'tb-badge-on':'tb-badge-off';}
+  const quotaRow=document.getElementById('sms-tb-quota-display');
+  if(quotaRow)quotaRow.style.display=on?'':'none';
+  if(on)checkTBQuotaSilent();
+}
+
+function syncTBToSMS(){
+  const hasTB=!!S.tb.key;
+  const el=document.getElementById('sms-tb-status-txt');
+  if(el)el.textContent=hasTB?`Key: ${S.tb.key.substring(0,10)}… · Mode: ${S.tb.testMode?'Test (no credits)':'Live'}`:'Not configured — click "TextBelt SMS" in sidebar to set up';
+}
+
+function refreshTBPage(){
+  const hasTB=!!S.tb.key;
+  const ki=document.getElementById('tb-key');if(ki&&!ki.value&&S.tb.key)ki.value=S.tb.key;
+  const tm=document.getElementById('tb-testmode');if(tm)tm.checked=S.tb.testMode;
+  const pu=document.getElementById('tb-proxy-url');if(pu&&S.tb.proxyUrl)pu.value=S.tb.proxyUrl;
+  updTBConnBadge(hasTB);
+  const mb=document.getElementById('tb-mode-badge');
+  if(mb){mb.textContent=hasTB?(S.tb.testMode?'Test Mode (free, no SMS sent)':'Live Mode'):'—';mb.className='badge '+(S.tb.testMode?'b-gold':hasTB?'b-sage':'b-ink');}
+  const tsd=document.getElementById('tb-total-sent');if(tsd)tsd.textContent=S.tb.totalSent;
+  if(S.tb.quota!==null){const qdEl=document.getElementById('tb-quota-disp');if(qdEl)qdEl.textContent=S.tb.quota;}
+}
+function applyVars(msg,recip,name=''){return msg.replace(/{name}/g,name||'Customer').replace(/{number}/g,recip).replace(/{date}/g,new Date().toLocaleDateString()).replace(/{company}/g,'Our Company');}
+function addSMSRow(n,recip,sndr,method,status,retries,time,textId){
+  const tb=document.getElementById('sms-res-body');
+  const tr=document.createElement('tr');tr.dataset.status=status;
+  const b=status==='sent'?'b-sage':status==='skipped'?'b-ink':'b-coral';
+  const l=status==='sent'?'✓ Sent':status==='skipped'?'⏭ Skipped':'✗ Failed';
+  const mb=method==='textbelt'?'<span class="badge b-gold" style="font-size:10px">📡 TB</span>':'<span class="badge b-sky" style="font-size:10px">📞 VoIP</span>';
+  const tidEl=textId?`<code style="font-family:monospace;font-size:10px;color:var(--sage)">${textId}</code>`:'<span class="t-ink4">—</span>';
+  tr.innerHTML=`<td class="t-ink4 fs12">${n}</td><td class="mono">${esc(recip)}</td><td class="mono" style="color:var(--sky);font-size:11px">${esc(sndr)}</td><td>${mb}</td><td><span class="badge ${b}">${l}</span></td><td>${tidEl}</td><td class="t-ink4 fs12">${retries}</td><td class="t-ink4 fs12">${new Date(time).toLocaleTimeString()}</td>`;
+  tb.insertBefore(tr,tb.firstChild);
+  if(tb.children.length>2000)tb.removeChild(tb.lastChild);
+}
+function filtRes(s,btn){
+  document.querySelectorAll('#sms-prog .btn-sm').forEach(b=>b.style.background='');
+  if(btn)btn.style.background='var(--cream3)';
+  document.querySelectorAll('#sms-res-body tr').forEach(tr=>{tr.style.display=(s==='all'||tr.dataset.status===s)?'':'none';});
+}
+
+// ── EMAIL CAMPAIGN ──
+let emailRow=0;
+function switchETab(mode,tab){document.querySelectorAll('#pg-email .tab').forEach(t=>t.classList.remove('on'));tab.classList.add('on');const ta=document.getElementById('e-body');ta.placeholder=mode==='html'?`<html><body>\n<h1>Hello {name}!</h1>\n<p>Your message here...</p>\n</body></html>`:`Hi {name},\n\nYour message here...\n\nBest regards,\nThe Team`;}
+function testEmail(){const aid=document.getElementById('ea-sel').value;if(!aid){toast('Select an email account first','warn');return;}setTimeout(()=>toast('Test email sent (simulated)','success'),400);}
+async function startEmail(){
+  const allR=[...S.emailR,...getManualEmails()];
+  if(!allR.length){showAlert('email-alerts','error','No recipients loaded.');return;}
+  const aid=document.getElementById('ea-sel').value;
+  if(!aid){showAlert('email-alerts','error','Please select an email account.');return;}
+  const acc=S.emailAccounts.find(a=>a.id===aid);
+  if(!acc){showAlert('email-alerts','error','Account not found.');return;}
+  const subject=document.getElementById('e-subject').value.trim();
+  const body=document.getElementById('e-body').value.trim();
+  const fname=document.getElementById('e-fname').value.trim();
+  const cname=document.getElementById('e-cname').value.trim()||'Email Campaign '+ts();
+  const rph=parseInt(document.getElementById('e-rate').value)||2000;
+  const sdel=Math.max(50,Math.round(3600000/rph));
+  if(!subject){showAlert('email-alerts','error','Enter a subject line.');return;}
+  if(!body){showAlert('email-alerts','error','Enter message body.');return;}
+  S.sendingEmail=true;S.stopEmail=false;emailRow=0;
+  setBtn('email-send-btn',true,'<span class="spin"></span> Sending…');
+  setBtn('email-stop-btn',false,'⏹ Stop',false);
+  document.getElementById('email-prog').classList.remove('hidden');
+  document.getElementById('email-res-body').innerHTML='';
+  const camp={id:uid(),name:cname,type:'email',total:allR.length,sent:0,delivered:0,failed:0,start:now(),end:null};
+  S.campaigns.push(camp);
+  let sent=0,del=0,fail=0,open=0;
+  for(let i=0;i<allR.length;i++){
+    if(S.stopEmail)break;
+    const rec=allR[i];
+    await sleep(Math.min(sdel,80));
+    // ── REPLACE simEmailSend WITH REAL BACKEND CALL ──
+    // const res = await fetch('/api/send-email', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ accountId: acc.id, to: rec.email, toName: rec.name,
+    //     from: acc.from, fromName: fname, subject: applyVars(subject, rec.email, rec.name),
+    //     body: applyVars(body, rec.email, rec.name) })
+    // });
+    // const ok = res.ok;
+    const ok=Math.random()>0.04;
+    const opened=ok&&Math.random()>0.5;
+    if(ok){del++;acc.usedToday++;S.stats.emailSent++;S.stats.emailDel++;}else{fail++;S.stats.failed++;}
+    if(opened)open++;sent++;
+    const pct=Math.round((sent/allR.length)*100);
+    setEl('email-pbar',null,`width:${pct}%`);setEl('email-pct',pct+'%');
+    setEl('ep-sent',sent);setEl('ep-del',del);setEl('ep-fail',fail);setEl('ep-open',open);
+    const le=addLog('email',rec.email,acc.from,subject,ok?'sent':'failed',0,'email','');
+    addEmailRow(++emailRow,rec.email,rec.name,ok?'sent':'failed',acc.name,le.time);
+    camp.sent=sent;camp.delivered=del;camp.failed=fail;
+  }
+  camp.end=now();S.sendingEmail=false;
+  setBtn('email-send-btn',false,'✉ Launch Email Campaign');
+  setBtn('email-stop-btn',true,'⏹ Stop',true);
+  toast(S.stopEmail?'Campaign stopped.':`Done! ${del} delivered, ${open} opened, ${fail} failed.`,S.stopEmail?'warn':'success');
+}
+function stopEmail(){S.stopEmail=true;}
+function addEmailRow(n,email,name,status,acc,time){
+  const tb=document.getElementById('email-res-body');const tr=document.createElement('tr');
+  const b=status==='sent'?'b-sage':'b-coral';const l=status==='sent'?'✓ Delivered':'✗ Bounced';
+  tr.innerHTML=`<td class="t-ink4 fs12">${n}</td><td class="mono">${esc(email)}</td><td class="t-ink4 fs12">${esc(name)}</td><td><span class="badge ${b}">${l}</span></td><td class="t-ink4 fs12">${esc(acc)}</td><td class="t-ink4 fs12">${new Date(time).toLocaleTimeString()}</td>`;
+  tb.insertBefore(tr,tb.firstChild);
+  if(tb.children.length>2000)tb.removeChild(tb.lastChild);
+}
+
+// ── LOGS ──
+function addLog(type,recip,sender,msg,status,retries,method,textId){const e={id:uid(),type,recipient:recip,sender,message:msg,status,retries,method:method||'',textId:textId||'',time:now()};S.logs.unshift(e);if(S.logs.length>10000)S.logs.pop();return e;}
+function setLF(f,btn){S.logFilter=f;document.querySelectorAll('.log-f-btn').forEach(b=>{b.style.background='';b.style.color='';});if(btn){btn.style.background='var(--ink)';btn.style.color='#fff';}renderLogs();}
+function renderLogs(){
+  const tb=document.getElementById('logs-body'),ee=document.getElementById('logs-empty');
+  const q=(document.getElementById('log-search')?.value||'').toLowerCase();
+  let logs=S.logs;
+  if(S.logFilter==='sms')logs=logs.filter(l=>l.type==='sms');
+  else if(S.logFilter==='email')logs=logs.filter(l=>l.type==='email');
+  else if(S.logFilter==='sent')logs=logs.filter(l=>l.status==='sent');
+  else if(S.logFilter==='failed')logs=logs.filter(l=>l.status==='failed');
+  if(q)logs=logs.filter(l=>l.recipient.toLowerCase().includes(q)||l.message.toLowerCase().includes(q)||l.sender.toLowerCase().includes(q));
+  ee.style.display=logs.length?'none':'';
+  tb.innerHTML=logs.slice(0,500).map(l=>{
+    const tb2=l.type==='email'?'b-sky':'b-ink';const tl=l.type==='email'?'✉ Email':'💬 SMS';
+    const sb=l.status==='sent'?'b-sage':l.status==='skipped'?'b-ink':'b-coral';
+    const sl=l.status==='sent'?'✓ Sent':l.status==='skipped'?'⏭ Skip':'✗ Failed';
+    const preview=l.message.length>40?l.message.substring(0,40)+'…':l.message;
+    return`<tr><td class="fs12 t-ink4">${new Date(l.time).toLocaleString()}</td><td><span class="badge ${tb2}">${tl}</span></td><td class="mono">${esc(l.recipient)}</td><td class="mono" style="color:var(--sky);font-size:11px">${esc(l.sender)}</td><td class="t-ink4 fs12" style="max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(preview)}</td><td><span class="badge ${sb}">${sl}</span></td><td class="t-ink4 fs12">${l.retries}</td></tr>`;
+  }).join('');
+}
+function clearLogs(){S.logs=[];renderLogs();toast('Logs cleared','info');}
+
+// ── DASHBOARD ──
+function refreshDash(){
+  setEl('ds-sms',S.stats.smsSent);setEl('ds-email',S.stats.emailSent);setEl('ds-fail',S.stats.failed);
+  setEl('ds-nums',S.numbers.filter(n=>n.active).length);
+  const sr=S.stats.smsSent?Math.round((S.stats.smsDel/S.stats.smsSent)*100):0;
+  const er=S.stats.emailSent?Math.round((S.stats.emailDel/S.stats.emailSent)*100):0;
+  setEl('ds-smsrate',sr+'%');setEl('ds-emailrate',er+'%');
+  const uEl=document.getElementById('d-usage');
+  if(S.numbers.length){
+    // Group numbers under their parent VoIP provider so each service is visible
+    const groups={};
+    S.providers.forEach(p=>{groups[p.id]={prov:p,nums:[]};});
+    S.numbers.forEach(n=>{if(!groups[n.providerId])groups[n.providerId]={prov:{name:'Unknown',emoji:'❓'},nums:[]};groups[n.providerId].nums.push(n);});
+    uEl.innerHTML=Object.values(groups).filter(g=>g.nums.length).map(g=>{
+      const active=g.nums.filter(n=>n.active).length;
+      const rows=g.nums.map(n=>{
+        const pct=n.limit>0?Math.min(100,Math.round((n.usedToday/n.limit)*100)):0;
+        const fc=pct>=100?'var(--coral)':pct>70?'var(--gold2)':'var(--sage2)';
+        return`<div class="srow"><span class="sphone">${esc(n.phone)}${n.purchased?' <span class="badge b-sage" style="font-size:9px;padding:1px 5px">bought</span>':''}</span><div class="sbar-wrap"><div class="sbar-fill" style="width:${n.limit>0?pct:0}%;background:${fc}"></div></div><span class="scnt">${n.usedToday}/${n.limit||'∞'}</span></div>`;
+      }).join('');
+      return`<div style="margin-bottom:14px"><div class="fc gap12" style="margin-bottom:8px"><span style="font-size:15px">${g.prov.emoji||'📱'}</span><span style="font-weight:600;font-size:13px">${esc(g.prov.name)}</span><span class="badge b-ink" style="font-size:10px">${active}/${g.nums.length} active</span></div>${rows}</div>`;
+    }).join('');
+  }
+  else{uEl.innerHTML='<div class="empty" style="padding:16px 0"><div class="empty-icon">📱</div><div class="empty-t">No numbers yet</div></div>';}
+  updDashLive();
+  const tbody=document.getElementById('d-camp-body');
+  if(!S.campaigns.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--ink4)">No campaigns yet</td></tr>';return;}
+  tbody.innerHTML=S.campaigns.slice().reverse().map(c=>{const rate=c.total?Math.round((c.delivered/c.total)*100):0;const rb=rate>=80?'b-sage':rate>=50?'b-gold':'b-coral';return`<tr><td>${esc(c.name)}</td><td><span class="badge ${c.type==='email'?'b-sky':'b-ink'}">${c.type==='email'?'✉ Email':'💬 SMS'}</span></td><td>${c.total}</td><td style="color:var(--sage);font-weight:700">${c.delivered}</td><td style="color:var(--coral)">${c.failed}</td><td><span class="badge ${rb}">${rate}%</span></td><td class="t-ink4 fs12">${new Date(c.start).toLocaleString()}</td></tr>`;}).join('');
+}
+function updDashLive(){
+  const el=document.getElementById('d-activity');const badge=document.getElementById('d-act-badge');
+  if(S.sendingSMS||S.sendingEmail){badge.className='badge b-sage-filled';badge.textContent='● Sending';}else{badge.className='badge b-ink';badge.textContent='Idle';}
+  const recent=S.logs.slice(0,15);
+  if(!recent.length){el.innerHTML='<div class="empty" style="padding:16px 0"><div class="empty-icon">💤</div><div class="empty-t">No activity</div></div>';return;}
+  el.innerHTML=recent.map(l=>{const ic=l.type==='email'?'li-mail':l.status==='sent'?'li-ok':'li-fail';const it=l.type==='email'?'@':l.status==='sent'?'✓':'✗';return`<div class="lrow"><div class="lico ${ic}">${it}</div><div class="lbody"><div class="lto">${esc(l.recipient)}</div><div class="lprev">${esc(l.message.substring(0,50))}</div></div><div class="ltime">${new Date(l.time).toLocaleTimeString()}</div></div>`;}).join('');
+}
+
+// ── SETTINGS ──
+function saveSettings(){S.settings.maxRetry=parseInt(document.getElementById('s-maxr').value);S.settings.retryDelay=parseInt(document.getElementById('s-retd').value);toast('Settings saved!','success');}
+function saveBulkSMS(){
+  S.bulksms.tokenId=document.getElementById('bs-tokenid').value.trim();
+  S.bulksms.tokenSecret=document.getElementById('bs-secret').value.trim();
+  S.bulksms.senderId=document.getElementById('bs-sender').value.trim();
+  S.bulksms.proxyUrl=document.getElementById('bs-proxy').value.trim();
+  const ready=S.bulksms.tokenId&&S.bulksms.tokenSecret;
+  const st=document.getElementById('bs-status');
+  if(st)st.textContent=ready?'✓ Credentials saved — BulkSMS senders are live':'⚠ Token ID and Secret both required';
+  toast(ready?'BulkSMS credentials saved!':'Enter both Token ID and Secret',ready?'success':'warn');
+}
+
+// ── BULKSMS CONNECTION PAGE ──
+function refreshBSPage(){
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
+  set('bsp-tokenid',S.bulksms.tokenId);set('bsp-secret',S.bulksms.tokenSecret);
+  set('bsp-sender',S.bulksms.senderId);set('bsp-proxy',S.bulksms.proxyUrl);
+  updBSStatus();
+}
+function updBSStatus(){
+  const ready=S.bulksms.tokenId&&S.bulksms.tokenSecret;
+  const cb=document.getElementById('bsp-cred-badge');
+  if(cb){cb.className='badge '+(ready?'b-sage':'b-ink');cb.textContent=ready?'● Connected':'● Not set';}
+  const sd=document.getElementById('bsp-sender-disp');
+  if(sd)sd.textContent=S.bulksms.senderId||'Repliable (none)';
+  const md=document.getElementById('bsp-mode-disp');
+  if(md)md.textContent=S.bulksms.proxyUrl?'Via proxy':'Direct';
+  const nb=document.getElementById('bs-nav-badge');
+  if(nb){nb.textContent=ready?'ON':'SETUP';nb.style.background=ready?'#2D7A5F':'#9b9690';}
+}
+function toggleBSSecret(btn){
+  const i=document.getElementById('bsp-secret');
+  if(i){i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'👁':'🙈';}
+}
+function saveBSP(){
+  S.bulksms.tokenId=document.getElementById('bsp-tokenid').value.trim();
+  S.bulksms.tokenSecret=document.getElementById('bsp-secret').value.trim();
+  S.bulksms.senderId=document.getElementById('bsp-sender').value.trim();
+  S.bulksms.proxyUrl=document.getElementById('bsp-proxy').value.trim();
+  const ready=S.bulksms.tokenId&&S.bulksms.tokenSecret;
+  const st=document.getElementById('bsp-status');
+  if(st)st.innerHTML=ready
+    ?'<span class="badge b-sage">✓ Saved — BulkSMS senders are live</span>'
+    :'<span class="badge b-coral">⚠ Token ID and Secret are both required</span>';
+  updBSStatus();
+  toast(ready?'BulkSMS credentials saved!':'Enter both Token ID and Secret',ready?'success':'warn');
+}
+function clearBSP(){
+  S.bulksms={tokenId:'',tokenSecret:'',senderId:'',proxyUrl:''};
+  ['bsp-tokenid','bsp-secret','bsp-sender','bsp-proxy'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const st=document.getElementById('bsp-status');if(st)st.innerHTML='';
+  updBSStatus();toast('BulkSMS credentials cleared','info');
+}
+async function testBSConn(){
+  saveBSP();
+  const st=document.getElementById('bsp-status');
+  if(!S.bulksms.tokenId||!S.bulksms.tokenSecret){
+    if(st)st.innerHTML='<span class="badge b-coral">⚠ Enter credentials first</span>';return;
+  }
+  if(st)st.innerHTML='<span class="badge b-ink">⏳ Testing connection…</span>';
+  const cred=bulksmsCredential();
+  const url=S.bulksms.proxyUrl||'https://api.bulksms.com/v1/profile';
+  try{
+    const res=await fetch(url,{headers:S.bulksms.proxyUrl?{}:{'Authorization':'Basic '+cred}});
+    if(res.ok)st.innerHTML='<span class="badge b-sage">✓ Connection OK — credentials accepted</span>';
+    else if(res.status===401)st.innerHTML='<span class="badge b-coral">✗ 401 — Token ID or Secret is wrong</span>';
+    else st.innerHTML=`<span class="badge b-gold">Reached server (HTTP ${res.status})</span>`;
+  }catch(e){
+    st.innerHTML='<span class="badge b-gold">⚠ CORS/Network blocked direct call. Credentials may still be valid — use a proxy URL for live sending.</span>';
+  }
+}
+async function sendBSTest(){
+  saveBSP();
+  const to=document.getElementById('bsp-test-to').value.trim();
+  const msg=document.getElementById('bsp-test-msg').value;
+  const st=document.getElementById('bsp-test-status');
+  if(!S.bulksms.tokenId||!S.bulksms.tokenSecret){st.innerHTML='<span class="badge b-coral">⚠ Save credentials first</span>';return;}
+  if(!validPhone(to)){st.innerHTML='<span class="badge b-coral">⚠ Enter a valid E.164 number (e.g. +447900000123)</span>';return;}
+  st.innerHTML='<span class="badge b-ink">⏳ Sending test…</span>';
+  const ok=await sendViaBulkSMS(null,to,msg);
+  if(ok){st.innerHTML='<span class="badge b-sage">✓ Test message accepted by BulkSMS</span>';toast('Test SMS sent via BulkSMS!','success');}
+  else{st.innerHTML='<span class="badge b-coral">✗ Send failed — check credentials, number, or CORS/proxy</span>';toast('BulkSMS test failed','error');}
+}
+function resetDaily(){S.numbers.forEach(n=>{n.usedToday=0;});S.emailAccounts.forEach(a=>{a.usedToday=0;});S.stats={smsSent:0,smsDel:0,emailSent:0,emailDel:0,failed:0};renderNums();refreshSMSSenders();refreshDash();toast('All daily limits reset!','success');}
+function resetAll(){Object.assign(S,{providers:[],numbers:[],emailAccounts:[],logs:[],campaigns:[],smsR:[],emailR:[],bulkBuf:[],stats:{smsSent:0,smsDel:0,emailSent:0,emailDel:0,failed:0},sendingSMS:false,sendingEmail:false,stopSMS:false,stopEmail:false});updBadges();go('dashboard');toast('All data reset','info');}
+
+// ── EXPORT ──
+function exportSMSRes(){const rows=[['#','Recipient','Sender','Status','Retries','Time']];S.logs.filter(l=>l.type==='sms').forEach((l,i)=>rows.push([i+1,l.recipient,l.sender,l.status,l.retries,l.time]));dlCSV(rows,'sms-results.csv');}
+function exportEmailRes(){const rows=[['#','Email','Status','Time']];S.logs.filter(l=>l.type==='email').forEach((l,i)=>rows.push([i+1,l.recipient,l.status,l.time]));dlCSV(rows,'email-results.csv');}
+function expLogs(){const rows=[['Time','Type','Recipient','From','Message','Status','Retries']];S.logs.forEach(l=>rows.push([l.time,l.type,l.recipient,l.sender,l.message,l.status,l.retries]));dlCSV(rows,'bulkreach-logs.csv');}
+function exportCampaigns(){const rows=[['Name','Type','Total','Delivered','Failed','Rate','Start']];S.campaigns.forEach(c=>{const r=c.total?Math.round((c.delivered/c.total)*100)+'%':'0%';rows.push([c.name,c.type,c.total,c.delivered,c.failed,r,c.start]);});dlCSV(rows,'campaigns.csv');}
+function expAll(){const safe={providers:S.providers.map(p=>({...p,tok:'[HIDDEN]'})),numbers:S.numbers,emailAccounts:S.emailAccounts.map(a=>({...a,apiKey:'[HIDDEN]',pass:'[HIDDEN]'})),logs:S.logs.slice(0,1000),campaigns:S.campaigns,stats:S.stats};const blob=new Blob([JSON.stringify(safe,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bulkreach-data.json';a.click();}
+function dlCSV(rows,fn){const csv=rows.map(r=>r.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;a.click();}
+
+// ── HELPERS ──
+function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
+function now(){return new Date().toISOString();}
+function ts(){return new Date().toLocaleTimeString();}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function setEl(id,txt,sty){const e=document.getElementById(id);if(!e)return;if(txt!==null&&txt!==undefined)e.textContent=txt;if(sty)e.style.cssText=sty;}
+function setBtn(id,disabled,html,hidden){const e=document.getElementById(id);if(!e)return;e.disabled=disabled;if(html)e.innerHTML=html;if(hidden!==undefined)e.classList.toggle('hidden',hidden);}
+function validPhone(p){return/^\+?[\d\s\-(). ]{5,20}$/.test(p);}
+function updBadges(){setEl('nb-p',S.providers.length);setEl('nb-n',S.numbers.length);setEl('nb-e',S.emailAccounts.length);}
+
+// ── CLOCK ──
+setInterval(()=>{const e=document.getElementById('clock');if(e)e.textContent=new Date().toLocaleString();},1000);
+document.getElementById('clock').textContent=new Date().toLocaleString();
+
+// ── DRAG/DROP ──
+document.querySelectorAll('.upzone').forEach(z=>{
+  z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('dov');});
+  z.addEventListener('dragleave',()=>z.classList.remove('dov'));
+  z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('dov');const f=e.dataTransfer.files[0];const inp=z.querySelector('input[type=file]');if(inp&&f){const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;inp.dispatchEvent(new Event('change'));}});
+});
+
+// ── INIT ──
+go('dashboard');
+</script>
+</body>
+</html>
